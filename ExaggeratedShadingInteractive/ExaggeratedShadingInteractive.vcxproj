@@ -87,7 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\imgui;C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,6 +147,16 @@
     <ClCompile Include="..\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ExaggeratedShadingInteractive.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\shaders\blur.vs" />
+    <None Include="..\shaders\cosine.fs" />
+    <None Include="..\shaders\cosine.vs" />
+    <None Include="..\shaders\ex.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\mesh.h" />
+    <ClInclude Include="..\include\model.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

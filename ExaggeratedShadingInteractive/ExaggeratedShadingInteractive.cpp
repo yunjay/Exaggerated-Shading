@@ -8,21 +8,32 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-/*
-#include "shader_m.h"
-#include "camera.h"
-#include "model.h"
-*/
 
 #include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
+
+#include "model.h"
 
 // settings
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+GLuint loadShader(const GLchar* vertexPath, const GLchar* fragmentPath);
 
+// timing
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+// UI
+float xDegrees = 30.0f;
+float yDegrees = 30.0f;
+bool xOn=true;
+float scale=0.02;
 int main()
 {
+    xOn = false;
 
     // glfw: initialize and configure
     glfwInit();
@@ -61,11 +72,30 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    glClearColor(0.05, 0.04, 0.03, 0.0); //background
+    glClearColor(0.15, 0.14, 0.13, 0.0); //background
+    
+    //Load Model
+    Model skull("../skull/12140_Skull_v3_L2.obj");
+
+    //Load Shader
+    GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
+    GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
+    GLuint* currentShader=&xShade;
+
+    //view
+    glm::vec3 cameraPos = glm::vec3(0, 0, 1);
+    //light settings
+    glm::vec3 lightPos = glm::vec3(-1, 1, 1);
+    glm::vec3 lightDiffuse = glm::vec3(1, 1, 1);
 
     //render loop
     while (!glfwWindowShouldClose(window))
     {
+        // per-frame time logic
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -77,7 +107,34 @@ int main()
         //IMGui window
         ImGui::Begin("XShade Interactive");
 
+        ImGui::Checkbox("Exaggerated Shading", &xOn);
+        ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
+        ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
+        ImGui::SliderFloat("Scale", &scale, 0.005f, 0.1f);
         ImGui::End();
+
+        if (!xOn)currentShader = &cosine;
+        else currentShader = &xShade;
+
+        glUseProgram(*currentShader);
+        glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
+        glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
+
+        glm::mat4 model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(0,-0.1, -1.0f));
+        model = glm::scale(model, glm::vec3(scale, scale, scale));
+        model = glm::rotate(model, glm::radians(yDegrees), glm::vec3(0,1,0));
+        model = glm::rotate(model, glm::radians(xDegrees), glm::vec3(1,0,0));
+        glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0,0,-1), glm::vec3(0,1,0));
+        glm::mat4 projection = glm::perspective(glm::radians(90.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        
+        glUniformMatrix4fv(glGetUniformLocation(*currentShader, "model"), 1, GL_FALSE, &model[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(*currentShader, "view"), 1, GL_FALSE, &view[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(*currentShader, "projection"), 1, GL_FALSE, &projection[0][0]);
+
+
+        skull.render(*currentShader);
+
 
 
 
@@ -101,6 +158,66 @@ int main()
     return 0;
 }
 
+GLuint loadShader(const GLchar* vertexPath, const GLchar* fragmentPath) {
+    GLuint program;
+    std::string vertexCode, fragmentCode;
+    std::ifstream vertexShaderFile, fragmentShaderFile;
+    //read code
+    vertexShaderFile.exceptions(std::ifstream::badbit);
+    fragmentShaderFile.exceptions(std::ifstream::badbit);
+    try {
+        vertexShaderFile.open(vertexPath);
+        fragmentShaderFile.open(fragmentPath);
+        std::stringstream vertexShaderStream, fragmentShaderStream;
+        vertexShaderStream << vertexShaderFile.rdbuf();
+        fragmentShaderStream << fragmentShaderFile.rdbuf();
+        vertexShaderFile.close();
+        fragmentShaderFile.close();
+        vertexCode = vertexShaderStream.str();
+        fragmentCode = fragmentShaderStream.str();
+    }
+    catch (std::ifstream::failure e) {
+        std::cout << "Shader failed to read\n";
+    }
+    const GLchar* vertexShaderCode = vertexCode.c_str();
+    const GLchar* fragmentShaderCode = fragmentCode.c_str(); 
+
+    GLuint vertexShader, fragmentShader;
+    GLint success;
+    GLchar log[512];
+
+    //gl shader creation/compilation functions
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);
+    glCompileShader(vertexShader);
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {   glGetShaderInfoLog(vertexShader, 512, NULL, log);
+        std::cout << "Vertex shader compilation failed\n" << log << std::endl;}
+
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderCode, NULL);
+    glCompileShader(fragmentShader);
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, log);
+        std::cout << "Fragment shader compilation failed\n" << log << std::endl;}
+
+    //program combines above shaders
+    program = glCreateProgram();
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, fragmentShader);
+    glLinkProgram(program);
+    glGetProgramiv(program, GL_LINK_STATUS, &success); 
+    if(!success){
+        glGetProgramInfoLog(program, 512, NULL, log);
+        std::cout << "Shader program linking failed\n" << log << "\n";
+    }
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    return program;
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

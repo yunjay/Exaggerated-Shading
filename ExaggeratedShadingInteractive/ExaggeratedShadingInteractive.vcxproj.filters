@@ -16,6 +16,9 @@
     <Filter Include="Source Files\IMGui">
       <UniqueIdentifier>{d685421c-b258-4fc5-8034-fda7b66acc60}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{913ff6e4-c1a8-4603-a12f-2ccec3795306}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ExaggeratedShadingInteractive.cpp">
@@ -42,5 +45,27 @@
     <ClCompile Include="..\imgui\imgui_draw.cpp">
       <Filter>Source Files\IMGui</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\shaders\cosine.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\shaders\ex.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\shaders\blur.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\shaders\cosine.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
