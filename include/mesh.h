@@ -34,6 +34,7 @@ class Mesh {
 public:
     // mesh Data
     vector<Vertex>       vertices;  
+    // gaussian smoothing I guess
     vector<vector<Vertex>> smoothed; 
     vector<unsigned int> indices;  //for indexed drawing
 

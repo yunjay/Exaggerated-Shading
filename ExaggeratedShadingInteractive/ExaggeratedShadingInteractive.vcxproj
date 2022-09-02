@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\mesh.h" />
     <ClInclude Include="..\include\model.h" />
+    <ClInclude Include="loadShader.h" />
     <ClInclude Include="smoothing.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
