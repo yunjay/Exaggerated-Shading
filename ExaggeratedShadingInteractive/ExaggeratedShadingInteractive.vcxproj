@@ -149,14 +149,15 @@
     <ClCompile Include="ExaggeratedShadingInteractive.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\shaders\blur.vs" />
     <None Include="..\shaders\cosine.fs" />
     <None Include="..\shaders\cosine.vs" />
-    <None Include="..\shaders\ex.fs" />
+    <None Include="..\shaders\xShade.fs" />
+    <None Include="..\shaders\xShade.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\mesh.h" />
     <ClInclude Include="..\include\model.h" />
+    <ClInclude Include="smoothing.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

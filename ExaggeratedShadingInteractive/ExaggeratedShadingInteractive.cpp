@@ -30,7 +30,11 @@ float lastFrame = 0.0f;
 float xDegrees = 30.0f;
 float yDegrees = 30.0f;
 bool xOn=true;
-float scale=0.02;
+float modelSize=0.02;
+
+int scales=10; //b, num of scales
+float contribution=-0.5;
+
 int main()
 {
     xOn = false;
@@ -46,7 +50,7 @@ int main()
 #endif
 
     // glfw window creation
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Exaggerated Shading Interactive", NULL, NULL);
     if (window == NULL)
     {std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -110,7 +114,9 @@ int main()
         ImGui::Checkbox("Exaggerated Shading", &xOn);
         ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
-        ImGui::SliderFloat("Scale", &scale, 0.005f, 0.1f);
+        ImGui::SliderFloat("Model Size", &modelSize, 0.005f, 0.1f);
+        ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 20);
+        ImGui::SliderFloat("Contribution factor of ki", &contribution, -5.0f, 5.0f);
         ImGui::End();
 
         if (!xOn)currentShader = &cosine;
@@ -121,8 +127,8 @@ int main()
         glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
 
         glm::mat4 model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(0,-0.1, -1.0f));
-        model = glm::scale(model, glm::vec3(scale, scale, scale));
+        model = glm::translate(model, glm::vec3(0,-0.4, -1.0f));
+        model = glm::scale(model, glm::vec3(modelSize, modelSize, modelSize));
         model = glm::rotate(model, glm::radians(yDegrees), glm::vec3(0,1,0));
         model = glm::rotate(model, glm::radians(xDegrees), glm::vec3(1,0,0));
         glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0,0,-1), glm::vec3(0,1,0));

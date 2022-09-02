@@ -33,7 +33,8 @@ struct Texture {
 class Mesh {
 public:
     // mesh Data
-    vector<Vertex>       vertices; 
+    vector<Vertex>       vertices;  
+    vector<vector<Vertex>> smoothed; 
     vector<unsigned int> indices;  //for indexed drawing
 
     vector<Texture>      textures; 
