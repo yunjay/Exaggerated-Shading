@@ -15,12 +15,13 @@
 #include "mesh.h"
 #include "model.h"
 //point = vec3
-//invsigma2 is inverse of sigma squared
-// Approximation to Gaussian...  Used in filtering
 inline float dist2(const glm::vec3&p1, const glm::vec3&p2) {
 	float d= glm::distance(p1, p2)*;
 	return d * d;
 }
+//invsigma2 is inverse of sigma squared
+// Approximation to Gaussian...  Used in filtering
+// weight
 inline float wt(const glm::vec3& p1, const glm::vec3& p2, float invsigma2)
 {
 	float d2 = invsigma2 * dist2(p1, p2);
@@ -29,9 +30,20 @@ inline float wt(const glm::vec3& p1, const glm::vec3& p2, float invsigma2)
 	//return (d2 >= 9.0f) ? 0.0f : exp(-0.5f*d2);
 	//return (d2 >= 25.0f) ? 0.0f : exp(-0.5f*d2);
 }
+/*
+//overloaded for mesh 
 inline float wt(const TriMesh* themesh, int v1, int v2, float invsigma2)
 {
 	return wt(themesh->vertices[v1], themesh->vertices[v2], invsigma2);
+}
+*/
+
+void calculateDistance(Model *model){
+	for(int i =0; i<model.meshes.size();i++){
+		for(int j=0; j<model.meshes[i].size();j++){
+			
+		}
+	}
 }
 
 //smooth normals

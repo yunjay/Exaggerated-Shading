@@ -32,6 +32,9 @@ public:
     
     bool gammaCorrection;
 
+    //just shove the vertexes down its throat for now... 
+    vector<glm::vec3> vectors;
+
     // constructor, expects a filepath to a 3D model.
     Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
     {
