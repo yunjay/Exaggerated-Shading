@@ -32,8 +32,9 @@ public:
     
     bool gammaCorrection;
 
-    //just shove the vertexes down its throat for now... 
-    vector<glm::vec3> vectors;
+    //just shove the vertices (positions) down its throat for now... 
+    //vector<glm::vec3> vertexPositions;
+    //vector<
 
     // constructor, expects a filepath to a 3D model.
     Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
@@ -104,6 +105,10 @@ private:
             vector.y = mesh->mVertices[i].y;
             vector.z = mesh->mVertices[i].z;
             vertex.Position = vector;
+            //custom
+            //vertexPositions.push_back(vector);
+            //cout << "Vertex Position " << i << " : " << vector.x << ", " << vector.y << ", " << vector.z << ", \n";
+
             // normals
             if (mesh->HasNormals())
             {

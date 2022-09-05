@@ -38,15 +38,16 @@ inline float wt(const TriMesh* themesh, int v1, int v2, float invsigma2)
 }
 */
 
-void calculateDistance(Model *model){
-	for(int i =0; i<model.meshes.size();i++){
-		for(int j=0; j<model.meshes[i].size();j++){
+void calculateWeights(Model *model){
+	//for every mesh in model
+	for(int i =0; i<model->vertexPositions.size();i++){
+		for(int j=i; j<model->meshes[i].vertices.size();j++){
 			
 		}
 	}
 }
 
-//smooth normals
+//smooth normals for some scales
 void smoothNormals(Mesh mesh, float sigma) {
 
 	std::cout << "Smoothing Normals\n";
@@ -56,3 +57,14 @@ void smoothNormals(Mesh mesh, float sigma) {
 	std::cout << "Filtering took"<<time(NULL)-*t<< " seconds.\n";
 	return;
 }
+//calculate
+void calculateNormals() {
+
+}
+// problems to solve
+// 1. calculating smoothed normals for eacy scales and saving to file (too large for local variables) up to 21 ks probably preprocessed.
+// Likely should make a different solution for preprocessing normals
+// 2. adding up everything according to contribution factor ki inside the shader
+// 3. take the user-variables as uniforms probably
+// i dont think using a geometry shader to solve in real time is smart, preprocessing seems like the best answer. The files get big af though fr
+
