@@ -26,17 +26,19 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // UI
-float xDegrees = 30.0f;
-float yDegrees = 30.0f;
+float xDegrees = 0.0f;
+float yDegrees = 0.0f;
 bool xOn=true;
-float modelSize=0.02;
+float modelSize=10.0f;
 
 int scales=10; //b, num of scales
-float contribution=-0.5;
-
+float contributionScale=-0.5
+float contribution[20]={0};//init to zeroe
+float sigma[20];
 int main()
 {
     xOn = false;
+    //TODO : sigma values. from featureSize and multiply by sqrt2 every step.
 
     // glfw: initialize and configure
     glfwInit();
@@ -115,8 +117,16 @@ int main()
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Model Size", &modelSize, 0.005f, 0.1f);
         ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 20);
-        ImGui::SliderFloat("Contribution factor of ki", &contribution, -5.0f, 5.0f);
+        ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
         ImGui::End();
+
+        //contribution factor
+        int sum=0;
+        float contributionBeforeNorm[20]={0};
+        for(int i=0;i<20;i++){
+            contributionBeforeNorm[i]=glm::pow(sigma[i],contributionScale);
+        }
+        contribution[i]=;
 
         if (!xOn)currentShader = &cosine;
         else currentShader = &xShade;
