@@ -15,7 +15,6 @@
 
 #include <ppl.h>
 
-#include "objReader.h"
 
 //#include "model.h"
 using std::vector;
@@ -59,9 +58,9 @@ float featureSize(const vector<glm::vec3> vertices) {
 	}
 	glm::vec3 diagonal(maxX-minX,maxY-minY,maxZ-minZ);
 	float diagonalLength = glm::length(diagonal);
-	cout << "Diagonal length of box bounding model : "<<diagonalLength<<"\n";
+	//cout << "Diagonal length of box bounding model : "<<diagonalLength<<"\n";
 	//arbitrary denominator
-	size = diagonalLength/100.0f;
+	size = diagonalLength/50.0f;
 	//Better Implementation - SUB SAMPLING
 	return size;
 }

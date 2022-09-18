@@ -14,6 +14,8 @@
 
 #include "model.h"
 #include "loadShader.h"
+#include "yjReader.h"
+#include "smoothing.h"
 
 // settings
 const unsigned int SCR_WIDTH = 1600;
@@ -32,13 +34,13 @@ bool xOn=true;
 float modelSize=10.0f;
 
 int scales=10; //b, num of scales
-float contributionScale=-0.5
-float contribution[20]={0};//init to zeroe
+float contributionScale = -0.5;
+float contribution[20]={0};//init to zeros
 float sigma[20];
 int main()
 {
     xOn = false;
-    //TODO : sigma values. from featureSize and multiply by sqrt2 every step.
+
 
     // glfw: initialize and configure
     glfwInit();
@@ -79,9 +81,10 @@ int main()
 
     glClearColor(0.15, 0.14, 0.13, 0.0); //background
     
-    //Load Model
-    Model skull("../skull/12140_Skull_v3_L2.obj");
-
+    //Load Model=
+    YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
+    //Sigma values. from featureSize and multiplied by sqrt2 every step.
+    for (int i = 0; i < 20; i++) sigma[i] = 0.4 * featureSize(bunny.vertices) * glm::pow(glm::sqrt(2),float(i));
     //Load Shader
     GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
     GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
@@ -120,13 +123,13 @@ int main()
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
         ImGui::End();
 
-        //contribution factor
+        //TODO : contribution factor
         int sum=0;
         float contributionBeforeNorm[20]={0};
         for(int i=0;i<20;i++){
             contributionBeforeNorm[i]=glm::pow(sigma[i],contributionScale);
         }
-        contribution[i]=;
+        //contribution[i]=;
 
         if (!xOn)currentShader = &cosine;
         else currentShader = &xShade;
@@ -148,7 +151,7 @@ int main()
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "projection"), 1, GL_FALSE, &projection[0][0]);
 
 
-        skull.render(*currentShader);
+        bunny.render(*currentShader);
 
 
 

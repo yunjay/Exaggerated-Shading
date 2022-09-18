@@ -87,7 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\imgui;C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\imgui;C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\include;C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\ExaggeratedShadingInteractive;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -100,6 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\include;C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\imgui;C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\ExaggeratedShadingInteractive;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,6 +160,7 @@
     <ClInclude Include="..\include\model.h" />
     <ClInclude Include="loadShader.h" />
     <ClInclude Include="smoothing.h" />
+    <ClInclude Include="yjReader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
