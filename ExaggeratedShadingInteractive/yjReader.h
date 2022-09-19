@@ -70,7 +70,7 @@ bool loadNormalsYJ(std::string path,
 }
 class YJ {
 public:
-	GLuint VAO, positionBuffer, normalBuffer; //doesnt utilize the EBO
+	GLuint VAO, positionBuffer, normalBuffer, textureBuffer, smoothedNormalsBuffer; //doesnt utilize the EBO
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> textureCoordinates;
@@ -129,6 +129,8 @@ public:
 		glGenVertexArrays(1, &VAO); //vertex array object
 		glGenBuffers(1, &positionBuffer); //vertex buffer object
 		glGenBuffers(1, &normalBuffer); //vertex buffer object
+		glGenBuffers(1, &textureBuffer); //vertex buffer object
+		glGenBuffers(1, &smoothedNormalsBuffer); //vertex buffer object
 
 		glBindVertexArray(VAO);
 
@@ -145,11 +147,11 @@ public:
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		/*
+		
 		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, textureCoordinates);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		*/
+		glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		
 		//TODO : SEND SMOOTHED NORMALS TO SHADER
 		return;
 	}
