@@ -130,7 +130,6 @@ public:
 		glGenBuffers(1, &positionBuffer); //vertex buffer object
 		glGenBuffers(1, &normalBuffer); //vertex buffer object
 		glGenBuffers(1, &textureBuffer); //vertex buffer object
-		glGenBuffers(1, &smoothedNormalsBuffer); //vertex buffer object
 
 		glBindVertexArray(VAO);
 
@@ -153,6 +152,14 @@ public:
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		
 		//TODO : SEND SMOOTHED NORMALS TO SHADER
+		//SSBO //smoothedNormalsBuffer is GLuint ID
+		glGenBuffers(1, &smoothedNormalsBuffer); //vertex buffer object
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER,smoothedNormalsBuffer);
+		//sizeof() works here because array is fixed size
+		glBufferData(GL_SHDAER_STORAGE_BUFFER,sizeof(smoothedNormals),smoothedNormals,GL_STATIC_DRAW);
+		glBufferBufferBase(GL_SHADER_STORAGE_BUFFER,3,smoothedNormalsBuffer);
+		//unbind
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER,0);
 		return;
 	}
 
