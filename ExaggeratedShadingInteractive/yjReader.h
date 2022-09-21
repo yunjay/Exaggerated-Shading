@@ -163,10 +163,9 @@ public:
 		
 		//TODO : SEND SMOOTHED NORMALS TO SHADER
 		//SSBO //smoothedNormalsBuffer is GLuint ID
+		//glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(smoothedNormals[0])*20,smoothedNormals,GL_STATIC_DRAW);
 		glGenBuffers(1, &smoothedNormalsBuffer); //vertex buffer object
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER,smoothedNormalsBuffer);
-		//sizeof() works here because array is fixed size
-		//glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(smoothedNormals[0])*20,smoothedNormals,GL_STATIC_DRAW);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(smoothedNormals[0]) * 20, &smoothedNormalsResized, GL_STATIC_DRAW);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER,3,smoothedNormalsBuffer);
 		//unbind

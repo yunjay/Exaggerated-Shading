@@ -91,6 +91,7 @@ int main()
     //Load Shader
     GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
     GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
+    GLuint softToon = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/softToon.fs");
     GLuint* currentShader=&xShade;
 
     //view
@@ -141,8 +142,10 @@ int main()
         }
         for (int i = 0; i < scales; i++) {
             contribution[i]=contributionBeforeNorm[i]/contributionSum;
+            //cout << "Contribution " << i << " : " << contribution[i] << "\n";
         }
 
+        //if (!xOn)currentShader = &softToon;
         if (!xOn)currentShader = &cosine;
         else currentShader = &xShade;
 
