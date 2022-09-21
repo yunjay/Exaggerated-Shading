@@ -32,10 +32,11 @@ float xDegrees = 0.0f;
 float yDegrees = 0.0f;
 bool xOn=true;
 float modelSize=10.0f;
-
+float diffuse = 1.0f;
+// Shading Variables
 int scales=10; //b, num of scales
 float contributionScale = -0.5;
-float contribution[20]={0};//init to zeros
+GLfloat contribution[20]={0};//init to zeros
 float sigma[20];
 int main()
 {
@@ -77,14 +78,16 @@ int main()
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+    ImGui_ImplOpenGL3_Init("#version 430");
 
     glClearColor(0.15, 0.14, 0.13, 0.0); //background
     
     //Load Model=
     YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
+    
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
     for (int i = 0; i < 20; i++) sigma[i] = 0.4 * featureSize(bunny.vertices) * glm::pow(glm::sqrt(2),float(i));
+    
     //Load Shader
     GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
     GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
@@ -94,7 +97,10 @@ int main()
     glm::vec3 cameraPos = glm::vec3(0, 0, 1);
     //light settings
     glm::vec3 lightPos = glm::vec3(-1, 1, 1);
-    glm::vec3 lightDiffuse = glm::vec3(1, 1, 1);
+    glm::vec3 lightDiffuse = glm::vec3(1, 1, 1)*diffuse;
+
+    //xShade settings
+    glUniform1f(glGetUniformLocation(xShade,"clampCoef"),20.0f);
 
     //render loop
     while (!glfwWindowShouldClose(window))
@@ -118,18 +124,24 @@ int main()
         ImGui::Checkbox("Exaggerated Shading", &xOn);
         ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
-        ImGui::SliderFloat("Model Size", &modelSize, 0.005f, 0.1f);
+        ImGui::SliderFloat("Model Size", &modelSize, 0.005f, 50.0f);
+        //ImGui::SliderFloat("Brightness", &diffuse, 0.0f, 2.0f);
         ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 20);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
         ImGui::End();
 
-        //TODO : contribution factor
-        int sum=0;
-        float contributionBeforeNorm[20]={0};
-        for(int i=0;i<20;i++){
+        glUniform1i(glGetUniformLocation(xShade, "scales"), scales);
+
+        //contribution factor
+        GLfloat contributionBeforeNorm[20]={0};
+        GLfloat contributionSum = 0;
+        for(int i=0;i<scales;i++){
             contributionBeforeNorm[i]=glm::pow(sigma[i],contributionScale);
+            contributionSum += contributionBeforeNorm[i];
         }
-        //contribution[i]=;
+        for (int i = 0; i < scales; i++) {
+            contribution[i]=contributionBeforeNorm[i]/contributionSum;
+        }
 
         if (!xOn)currentShader = &cosine;
         else currentShader = &xShade;
@@ -137,6 +149,11 @@ int main()
         glUseProgram(*currentShader);
         glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
+        if (xOn) {
+            //send contribution ki to shader as uniform (array)
+            glUniform1fv(glGetUniformLocation(*currentShader,"contribution"),20,contribution);
+        }
+
 
         glm::mat4 model = glm::mat4(1);
         model = glm::translate(model, glm::vec3(0,-0.4, -1.0f));

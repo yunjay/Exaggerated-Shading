@@ -70,12 +70,14 @@ bool loadNormalsYJ(std::string path,
 }
 class YJ {
 public:
-	GLuint VAO, positionBuffer, normalBuffer, textureBuffer, smoothedNormalsBuffer; //doesnt utilize the EBO
+	GLuint VAO, positionBuffer, normalBuffer, textureBuffer, smoothedNormalsBuffer; //doesnt utilize EBO for now
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> textureCoordinates;
 	std::string path;
 	std::vector<glm::vec3> smoothedNormals[20];
+	//std::vector<glm::vec3[20]> smoothedNormalsResized; -> YOU CAN'T MAKE A VECTOR OF PLAIN ARRAYS
+	std::vector<vector<glm::vec3>> smoothedNormalsResized;
 	bool isSet = false;
 	YJ(std::string path ) {
 		this->path = path;
@@ -124,6 +126,14 @@ public:
 			if (i > 8)smoothedPath.erase(smoothedPath.length() - 7, 7); //erases _k(number i).yj, bad implementation tbh if the legth of the extension name changes it won't work
 			else smoothedPath.erase(smoothedPath.length() - 6, 6);
 		}
+		//Transpose because of reasons
+		smoothedNormalsResized.resize(smoothedNormals[0].size());
+		for (int i = 0; i < smoothedNormals[0].size(); i++) {
+			smoothedNormalsResized[i].resize(20);
+			for (int j = 0; j < 20; j++) {
+				smoothedNormalsResized[i][j]=smoothedNormals[j][i];
+			}
+		}
 	}
 	void setupYJ() {
 		glGenVertexArrays(1, &VAO); //vertex array object
@@ -156,8 +166,9 @@ public:
 		glGenBuffers(1, &smoothedNormalsBuffer); //vertex buffer object
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER,smoothedNormalsBuffer);
 		//sizeof() works here because array is fixed size
-		glBufferData(GL_SHDAER_STORAGE_BUFFER,sizeof(smoothedNormals),smoothedNormals,GL_STATIC_DRAW);
-		glBufferBufferBase(GL_SHADER_STORAGE_BUFFER,3,smoothedNormalsBuffer);
+		//glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(smoothedNormals[0])*20,smoothedNormals,GL_STATIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(smoothedNormals[0]) * 20, &smoothedNormalsResized, GL_STATIC_DRAW);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER,3,smoothedNormalsBuffer);
 		//unbind
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER,0);
 		return;
