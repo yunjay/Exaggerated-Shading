@@ -42,15 +42,15 @@ void main() {
     vec3 normal_ip1;
     float detailTerms=0.0;
     float c_i=0.0;
-    for(int i=1;i<scales;i++){
+    for(int i=0;i<scales;i++){
         //load smoothed normals
-        normal_i=smoothedNormals[gl_VertexID][i-1];
-        normal_ip1=smoothedNormals[gl_VertexID][i];
+        normal_i=smoothedNormals[gl_VertexID][i];
+        normal_ip1=smoothedNormals[gl_VertexID][i+1];
         
         light_ip1=normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
         c_i = clamp(clampCoef*dot(normal_i,light_ip1),-1.0,1.0);
         detailTerms+=contribution[i]*c_i;
     }
-    col=(0.5 + 0.5*(contribution[0]*dot(Normal,lightGlobal)+detailTerms))*textureColor;
+    col=(0.5 + 0.5*(contribution[scales]*dot(smoothedNormals[gl_VertexID][scales],lightGlobal)+detailTerms))*textureColor;
 
 }

@@ -160,7 +160,7 @@ public:
 		glEnableVertexAttribArray(2);
 		glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		
+		glBindBuffer(GL_ARRAY_BUFFER,0);
 		//TODO : SEND SMOOTHED NORMALS TO SHADER
 		//SSBO //smoothedNormalsBuffer is GLuint ID
 		//glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(smoothedNormals[0])*20,smoothedNormals,GL_STATIC_DRAW);
