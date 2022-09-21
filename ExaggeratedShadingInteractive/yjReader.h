@@ -77,7 +77,8 @@ public:
 	std::string path;
 	std::vector<glm::vec3> smoothedNormals[20];
 	//std::vector<glm::vec3[20]> smoothedNormalsResized; -> YOU CAN'T MAKE A VECTOR OF PLAIN ARRAYS
-	std::vector<vector<glm::vec3>> smoothedNormalsResized;
+	glm::vec3** smoothedNormalsArr;
+	glm::vec4* smoothedNormalsSingleArr;
 	bool isSet = false;
 	YJ(std::string path ) {
 		this->path = path;
@@ -122,16 +123,18 @@ public:
 		for (int i = 0; i < 20; i++) {
 			smoothedPath = smoothedPath + "_k" + std::to_string(i+1) + ".yj";
 			if (!loadNormalsYJ(smoothedPath, this->smoothedNormals[i]))std::cout << "Failed to load smoothed normals at : " << smoothedPath << "\n";
-			else std::cout << "Loaded smoothed normals "<<i<< " at " << smoothedPath << "\nFirst smoothed normal : " << this->smoothedNormals[i][0].x << ", " << this->smoothedNormals[i][0].y << ", " << this->smoothedNormals[i][0].z<<"\n";
+			else std::cout << "Loaded smoothed normals "<<i<< " at " << smoothedPath << "\nFirst smoothed normal : " << this->smoothedNormals[i][0].x << ", " << this->smoothedNormals[i][0].y << ", " << this->smoothedNormals[i][0].z<<"\n"<<"Size : "<<smoothedNormals[i].size()<<"\n";
 			if (i > 8)smoothedPath.erase(smoothedPath.length() - 7, 7); //erases _k(number i).yj, bad implementation tbh if the legth of the extension name changes it won't work
 			else smoothedPath.erase(smoothedPath.length() - 6, 6);
 		}
 		//Transpose because of reasons
-		smoothedNormalsResized.resize(smoothedNormals[0].size());
+		//smoothedNormalsArr = new glm::vec3* [smoothedNormals[0].size()] ;
+		smoothedNormalsSingleArr = new glm::vec4[smoothedNormals[0].size() * 20];
 		for (int i = 0; i < smoothedNormals[0].size(); i++) {
-			smoothedNormalsResized[i].resize(20);
+			//smoothedNormalsArr[i] = new glm::vec3[20];
 			for (int j = 0; j < 20; j++) {
-				smoothedNormalsResized[i][j]=smoothedNormals[j][i];
+				//smoothedNormalsArr[i][j]=smoothedNormals[j][i];
+				smoothedNormalsSingleArr[i + j*smoothedNormals[0].size()] = glm::vec4(smoothedNormals[j][i],1.0);
 			}
 		}
 	}
@@ -164,18 +167,25 @@ public:
 		//TODO : SEND SMOOTHED NORMALS TO SHADER
 		//SSBO //smoothedNormalsBuffer is GLuint ID
 		//glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(smoothedNormals[0])*20,smoothedNormals,GL_STATIC_DRAW);
+		
+		//Can't send std::vector or any other objects to glsl, they won't work.
+		
 		glGenBuffers(1, &smoothedNormalsBuffer); //vertex buffer object
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER,smoothedNormalsBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(smoothedNormals[0]) * 20, &smoothedNormalsResized, GL_STATIC_DRAW);
+		//glBufferData(GL_SHADER_STORAGE_BUFFER, 20*smoothedNormals[0].size()*sizeof(glm::vec3), smoothedNormalsSingleArr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, 20*smoothedNormals[0].size()*sizeof(glm::vec4), smoothedNormalsSingleArr, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER,3,smoothedNormalsBuffer);
+		
+		
 		//unbind
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER,0);
+		//glBindBuffer(GL_SHADER_STORAGE_BUFFER,0);
 		return;
 	}
 
 	bool render(GLuint shader) {
 
 		if (!isSet) { setupYJ(); isSet = true; }
+		glUniform1i(glGetUniformLocation(shader, "size"), smoothedNormals[0].size());
 		/*GLuint VAO, positionBuffer, normalBuffer; //doesnt utilize the EBO
 		glGenVertexArrays(1, &VAO); //vertex array object
 		glGenBuffers(1, &positionBuffer); //vertex buffer object
