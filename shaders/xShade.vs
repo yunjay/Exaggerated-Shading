@@ -4,7 +4,7 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 //vec3 smoothedNormals[20][]; -> not legal
 
-layout(binding = 3, std430) buffer smoothedNormalsBuffer  
+layout(binding = 4, std430) buffer smoothedNormalsBuffer  
 {
     //vec3 smoothedNormals[][20];  
     //vec3 smoothedNormals[];
