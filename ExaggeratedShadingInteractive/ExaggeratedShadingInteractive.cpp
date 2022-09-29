@@ -12,7 +12,6 @@
 #include <iostream>
 #include <string>
 
-#include "model.h"
 #include "loadShader.h"
 #include "yjReader.h"
 #include "smoothing.h"
@@ -21,7 +20,6 @@
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-GLuint loadShader(const GLchar* vertexPath, const GLchar* fragmentPath);
 
 // timing
 float deltaTime = 0.0f;
@@ -38,6 +36,7 @@ int scales=10; //b, num of scales
 float contributionScale = -0.5;
 GLfloat contribution[20]={0};//init to zeros
 float sigma[20];
+void printShader(YJ yj, float contribution[]);
 int main()
 {
     xOn = false;
@@ -103,6 +102,8 @@ int main()
     //xShade settings
     glUniform1f(glGetUniformLocation(xShade,"clampCoef"),20.0f);
 
+    //printShader(bunny, contribution);
+
     //render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -144,7 +145,7 @@ int main()
             contribution[i]=contributionBeforeNorm[i]/contributionSum;
             //cout << "Contribution " << i << " : " << contribution[i] << "\n";
         }
-
+        glUniform1fv(glGetUniformLocation(xShade, "contribution"), 20, contribution);
         //if (!xOn)currentShader = &softToon;
         if (!xOn)currentShader = &cosine;
         else currentShader = &xShade;
@@ -154,7 +155,7 @@ int main()
         glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
         if (xOn) {
             //send contribution ki to shader as uniform (array)
-            glUniform1fv(glGetUniformLocation(*currentShader,"contribution"),20,contribution);
+            
         }
 
 
@@ -170,6 +171,7 @@ int main()
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "view"), 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "projection"), 1, GL_FALSE, &projection[0][0]);
 
+        printShader(bunny, contribution);
 
         bunny.render(*currentShader);
 
@@ -202,4 +204,48 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+void printShader(YJ yj, float contribution[]) {
+    glm::vec3 textureColor = glm::vec3(0.95,0.95,0.95);
+
+    glm::vec4 light_ip1;
+    glm::vec4 normal_i;
+    glm::vec4 normal_ip1;
+    glm::vec4 lightGlobal = glm::vec4(normalize(glm::vec3(-1, 1, 1)),0.0);
+    float detailTerms=0.0;
+    float c_i=0.0;
+    for(int i=0;i<scales;i++){
+        //load smoothed normals
+        normal_i=glm::normalize(yj.smoothedNormalsSingleArr[i*yj.smoothedNormals[i].size()]);
+        normal_ip1=normalize(yj.smoothedNormalsSingleArr[(i+1)*yj.smoothedNormals[i].size()]);
+        
+        light_ip1=normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
+        c_i = glm::clamp(20*dot(normal_i,light_ip1),-1.0f,1.0f);
+        detailTerms+=contribution[i]*c_i;
+        std::cout << "Contibution " << i << " at first vertex = " << contribution[i] << "\n";
+        std::cout << "c_i at " << i << " at first vertex = " << c_i << "\n";
+        std::cout << "Detail term " << i << " at first vertex = " << contribution[i] * c_i << "\n";
+    }
+
+    glm::vec4 col=(0.5f + 0.5f*(contribution[scales]*glm::dot(yj.smoothedNormalsSingleArr[scales* yj.smoothedNormals[0].size()],lightGlobal)+detailTerms))*glm::vec4(textureColor,1.0);
+    std::cout << "Total detail terms = " << detailTerms << "\n";
+    std::cout << "Final color of first vertex = " << col.x<<", "<<col.y<<", "<<col.z << "\n\n";
+
+    for (int i = 0; i < scales; i++) {
+        //load smoothed normals
+        normal_i = glm::normalize(yj.smoothedNormalsSingleArr[i * yj.smoothedNormals[i].size()+ yj.smoothedNormals[i].size()/2]);
+        normal_ip1 = normalize(yj.smoothedNormalsSingleArr[(i + 1) * yj.smoothedNormals[i].size() + yj.smoothedNormals[i].size()/2]);
+
+        light_ip1 = normalize(lightGlobal - dot(lightGlobal, normal_ip1) * normal_ip1);
+        c_i = glm::clamp(20 * dot(normal_i, light_ip1), -1.0f, 1.0f);
+        detailTerms += contribution[i] * c_i;
+        std::cout << "Contibution " << i << " at median vertex = " << contribution[i] << "\n";
+        std::cout << "c_i at " << i << " at median vertex = " << c_i << "\n";
+        std::cout << "Detail term " << i << " at median vertex = " << contribution[i] * c_i << "\n";
+    }
+
+    col = (0.5f + 0.5f * (contribution[scales] * glm::dot(yj.smoothedNormalsSingleArr[scales * yj.smoothedNormals[0].size()], lightGlobal) + detailTerms)) * glm::vec4(textureColor, 1.0);
+    std::cout << "Total detail terms = " << detailTerms << "\n";
+    std::cout << "Final color of median vertex = " << col.x << ", " << col.y << ", " << col.z << "\n\n";
 }

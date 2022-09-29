@@ -6,8 +6,6 @@ layout (location = 2) in vec2 aTexCoords;
 
 layout(binding = 4, std430) buffer smoothedNormalsBuffer  
 {
-    //vec3 smoothedNormals[][20];  
-    //vec3 smoothedNormals[];
     vec4 smoothedNormals[];
 };
 
@@ -39,7 +37,7 @@ void main() {
     //vec3 Normal = normalize(mat3(transpose(inverse(model))) * aNormal);
     vec3 Normal = normalize(aNormal);
     //vec3 lightGlobal = normalize(light.position - FragPos);
-    vec4 lightGlobal = vec4(normalize(light.position - FragPos),1.0);
+    vec4 lightGlobal = vec4(normalize(light.position - FragPos),0.0);
     
 
     TexCoords = aTexCoords;
@@ -56,16 +54,16 @@ void main() {
     float c_i=0.0;
     for(int i=0;i<scales;i++){
         //load smoothed normals
-        //normal_i=smoothedNormals[gl_VertexID][i];
-        normal_i=smoothedNormals[gl_VertexID+i*size];
-        //normal_ip1=smoothedNormals[gl_VertexID][i+1];
-        normal_ip1=smoothedNormals[gl_VertexID+(i+1)*size];
+        normal_i=normalize(smoothedNormals[gl_VertexID+i*size]);
+        normal_ip1=normalize(smoothedNormals[gl_VertexID+(i+1)*size]);
         
         light_ip1=normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
         c_i = clamp(clampCoef*dot(normal_i,light_ip1),-1.0,1.0);
         detailTerms+=contribution[i]*c_i;
     }
-    //col=(0.5 + 0.5*(contribution[scales]*dot(smoothedNormals[gl_VertexID][scales],lightGlobal)+detailTerms))*textureColor;
-    col=(0.5 + 0.5*(contribution[scales]*dot(smoothedNormals[gl_VertexID+size*scales],lightGlobal)+detailTerms))*vec4(textureColor,1.0);
+    //col=(0.5 + 0.5*(contribution[scales]*dot(smoothedNormals[gl_VertexID+scales*size],lightGlobal)+detailTerms))*vec4(textureColor,1.0);
+    
+    col = smoothedNormals[gl_VertexID]*vec4(textureColor,1.0);
+    //col=(0.5 + 1.0*(detailTerms))*vec4(textureColor,1.0);
 
 }

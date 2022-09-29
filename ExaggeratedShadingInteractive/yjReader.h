@@ -77,7 +77,6 @@ public:
 	std::string path;
 	std::vector<glm::vec3> smoothedNormals[20];
 	//std::vector<glm::vec3[20]> smoothedNormalsResized; -> YOU CAN'T MAKE A VECTOR OF PLAIN ARRAYS
-	glm::vec3** smoothedNormalsArr;
 	glm::vec4* smoothedNormalsSingleArr;
 	bool isSet = false;
 	YJ(std::string path ) {
@@ -134,7 +133,7 @@ public:
 			//smoothedNormalsArr[i] = new glm::vec3[20];
 			for (int j = 0; j < 20; j++) {
 				//smoothedNormalsArr[i][j]=smoothedNormals[j][i];
-				smoothedNormalsSingleArr[i + j*smoothedNormals[0].size()] = glm::vec4(smoothedNormals[j][i],1.0);
+				smoothedNormalsSingleArr[i + j*smoothedNormals[0].size()] = glm::vec4(smoothedNormals[j][i],0.0);
 			}
 		}
 	}
@@ -172,11 +171,23 @@ public:
 		
 		glGenBuffers(1, &smoothedNormalsBuffer); //vertex buffer object
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER,smoothedNormalsBuffer);
-		//glBufferData(GL_SHADER_STORAGE_BUFFER, 20*smoothedNormals[0].size()*sizeof(glm::vec3), smoothedNormalsSingleArr, GL_DYNAMIC_DRAW);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, 20*smoothedNormals[0].size()*sizeof(glm::vec4), smoothedNormalsSingleArr, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER,4,smoothedNormalsBuffer);
 		
-		
+		//SSBO Debugging
+		for (int i = 0; i < 20; i++) {
+			glm::vec4 dat;
+			//offset measured in bytes not indices
+			for (int j = 0; j < 2; j++) {
+				int offset = i * smoothedNormals[0].size() * sizeof(glm::vec4) + j * sizeof(glm::vec4);
+				glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(glm::vec4), &dat);
+				std::cout << "At " << offset << " : " << dat.x << ", " << dat.y << "," << dat.z << "\n";
+				offset = (i + 1) * smoothedNormals[0].size() * sizeof(glm::vec4) - (j+1) * sizeof(glm::vec4);
+				glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(glm::vec4), &dat);
+				std::cout << "At " << offset << " : " << dat.x << ", " << dat.y << "," << dat.z << "\n";
+			}
+
+		}
 		//unbind
 		//glBindBuffer(GL_SHADER_STORAGE_BUFFER,0);
 		return;

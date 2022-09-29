@@ -156,8 +156,6 @@
     <None Include="..\shaders\xShade.vs" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\mesh.h" />
-    <ClInclude Include="..\include\model.h" />
     <ClInclude Include="loadShader.h" />
     <ClInclude Include="smoothing.h" />
     <ClInclude Include="yjReader.h" />

@@ -61,12 +61,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="smoothing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
