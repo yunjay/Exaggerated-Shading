@@ -63,7 +63,7 @@ void main() {
     }
     //col=(0.5 + 0.5*(contribution[scales]*dot(smoothedNormals[gl_VertexID+scales*size],lightGlobal)+detailTerms))*vec4(textureColor,1.0);
     
-    col = smoothedNormals[gl_VertexID]*vec4(textureColor,1.0);
+    col = dot(smoothedNormals[gl_VertexID],lightGlobal)*vec4(textureColor,1.0);
     //col=(0.5 + 1.0*(detailTerms))*vec4(textureColor,1.0);
 
 }
