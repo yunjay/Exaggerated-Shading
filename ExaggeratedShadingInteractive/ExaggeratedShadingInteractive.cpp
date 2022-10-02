@@ -171,7 +171,7 @@ int main()
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "view"), 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "projection"), 1, GL_FALSE, &projection[0][0]);
 
-        printShader(bunny, contribution);
+        //printShader(bunny, contribution);
 
         bunny.render(*currentShader);
 
@@ -212,15 +212,15 @@ void printShader(YJ yj, float contribution[]) {
     glm::vec4 light_ip1;
     glm::vec4 normal_i;
     glm::vec4 normal_ip1;
-    glm::vec4 lightGlobal = glm::vec4(normalize(glm::vec3(-1, 1, 1)),0.0);
+    glm::vec4 lightGlobal = glm::vec4(normalize(glm::vec3(-1, 1, 1)),0.0f);
     float detailTerms=0.0;
     float c_i=0.0;
     for(int i=0;i<scales;i++){
         //load smoothed normals
         normal_i=glm::normalize(yj.smoothedNormalsSingleArr[i*yj.smoothedNormals[i].size()]);
-        normal_ip1=normalize(yj.smoothedNormalsSingleArr[(i+1)*yj.smoothedNormals[i].size()]);
+        normal_ip1= glm::normalize(yj.smoothedNormalsSingleArr[(i+1)*yj.smoothedNormals[i].size()]);
         
-        light_ip1=normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
+        light_ip1= glm::normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
         c_i = glm::clamp(20*dot(normal_i,light_ip1),-1.0f,1.0f);
         detailTerms+=contribution[i]*c_i;
         std::cout << "Contibution " << i << " at first vertex = " << contribution[i] << "\n";
@@ -228,7 +228,7 @@ void printShader(YJ yj, float contribution[]) {
         std::cout << "Detail term " << i << " at first vertex = " << contribution[i] * c_i << "\n";
     }
 
-    glm::vec4 col=(0.5f + 0.5f*(contribution[scales]*glm::dot(yj.smoothedNormalsSingleArr[scales* yj.smoothedNormals[0].size()],lightGlobal)+detailTerms))*glm::vec4(textureColor,1.0);
+    glm::vec4 col=(0.5f + 0.5f*(contribution[scales]*glm::dot(glm::normalize(yj.smoothedNormalsSingleArr[scales* yj.smoothedNormals[0].size()]),lightGlobal)+detailTerms))*glm::vec4(textureColor,1.0);
     std::cout << "Total detail terms = " << detailTerms << "\n";
     std::cout << "Final color of first vertex = " << col.x<<", "<<col.y<<", "<<col.z << "\n\n";
 

@@ -175,6 +175,7 @@ public:
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER,4,smoothedNormalsBuffer);
 		
 		//SSBO Debugging
+		/*
 		for (int i = 0; i < 20; i++) {
 			glm::vec4 dat;
 			//offset measured in bytes not indices
@@ -186,8 +187,8 @@ public:
 				glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(glm::vec4), &dat);
 				std::cout << "At " << offset << " : " << dat.x << ", " << dat.y << "," << dat.z << "\n";
 			}
-
 		}
+		*/
 		//unbind
 		//glBindBuffer(GL_SHADER_STORAGE_BUFFER,0);
 		return;
