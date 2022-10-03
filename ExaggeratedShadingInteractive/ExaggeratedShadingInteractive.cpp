@@ -35,11 +35,11 @@ float diffuse = 1.0f;
 int scales=10; //b, num of scales
 float contributionScale = -0.5;
 GLfloat contribution[20]={0};//init to zeros
-float sigma[20];
+GLfloat sigma[20];
 void printShader(YJ yj, float contribution[]);
 int main()
 {
-    xOn = false;
+    //xOn = false;
 
 
     // glfw: initialize and configure
@@ -99,8 +99,7 @@ int main()
     glm::vec3 lightPos = glm::vec3(-1, 1, 1);
     glm::vec3 lightDiffuse = glm::vec3(1, 1, 1)*diffuse;
 
-    //xShade settings
-    glUniform1f(glGetUniformLocation(xShade,"clampCoef"),20.0f);
+    
 
     //printShader(bunny, contribution);
 
@@ -132,7 +131,7 @@ int main()
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
         ImGui::End();
 
-        glUniform1i(glGetUniformLocation(xShade, "scales"), scales);
+        
 
         //contribution factor
         GLfloat contributionBeforeNorm[20]={0};
@@ -145,18 +144,23 @@ int main()
             contribution[i]=contributionBeforeNorm[i]/contributionSum;
             //cout << "Contribution " << i << " : " << contribution[i] << "\n";
         }
-        glUniform1fv(glGetUniformLocation(xShade, "contribution"), 20, contribution);
+        
         //if (!xOn)currentShader = &softToon;
         if (!xOn)currentShader = &cosine;
         else currentShader = &xShade;
 
         glUseProgram(*currentShader);
+
+        //Uniforms
         glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
         if (xOn) {
+            // YOU NEED TO BIND PROGRAM WITH GLUSEPROGRAM BEFORE glUNIFORM
             //send contribution ki to shader as uniform (array)
-            
-        }
+            glUniform1fv(glGetUniformLocation(xShade, "contribution"), 20, contribution);
+            glUniform1f(glGetUniformLocation(xShade,"clampCoef"),10.0f);
+            glUniform1i(glGetUniformLocation(xShade, "scales"), scales);
+            }
 
 
         glm::mat4 model = glm::mat4(1);
@@ -208,7 +212,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void printShader(YJ yj, float contribution[]) {
     glm::vec3 textureColor = glm::vec3(0.95,0.95,0.95);
-
     glm::vec4 light_ip1;
     glm::vec4 normal_i;
     glm::vec4 normal_ip1;
