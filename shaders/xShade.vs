@@ -64,16 +64,18 @@ void main() {
     //actual implementation
     col=(0.5 + 0.5*(contribution[scales]*dot(normalize(smoothedNormals[gl_VertexID+scales*size]),lightGlobal)+detailTerms))*vec4(textureColor,1.0);
     
-    //check normals, and indexing
-    //col = dot(smoothedNormals[gl_VertexID],lightGlobal)*vec4(textureColor,1.0);
-    //col = dot(smoothedNormals[gl_VertexID+size*11],lightGlobal)*vec4(textureColor,1.0);
-    
+    //check normals, and indexing   
+    //col = dot(smoothedNormals[gl_VertexID],lightGlobal)*vec4(textureColor,0.0);
+    //col = dot(smoothedNormals[gl_VertexID+size],lightGlobal)*vec4(textureColor,0.0);
+    //col = dot(smoothedNormals[gl_VertexID+size*10],lightGlobal)*vec4(textureColor,0.0);
+    //col = dot(smoothedNormals[gl_VertexID+size*19],lightGlobal)*vec4(textureColor,0.0);
+
     //check clampCoef
-    //col = 0.1*clampCoef*vec4(textureColor,1.0);
+    //col = 0.1*clampCoef*vec4(textureColor,0.0);
     
     //check detail terms
-    //col= 2*detailTerms*vec4(textureColor,1.0);
+    //col= 2*detailTerms*vec4(textureColor,0.0);
 
     //check contribution uniform
-    //col = 2*contribution[0]*vec4(textureColor,1.0);
+    //col = 2*contribution[0]*vec4(textureColor,0.0);
 }

@@ -36,6 +36,7 @@ int scales=10; //b, num of scales
 float contributionScale = -0.5;
 GLfloat contribution[20]={0};//init to zeros
 GLfloat sigma[20];
+float clampCoef = 20.0;
 void printShader(YJ yj, float contribution[]);
 int main()
 {
@@ -79,7 +80,7 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
 
-    glClearColor(0.15, 0.14, 0.13, 0.0); //background
+    glClearColor(30/255, 30/255, 30/255, 0.0); //background
     
     //Load Model=
     YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
@@ -99,9 +100,6 @@ int main()
     glm::vec3 lightPos = glm::vec3(-1, 1, 1);
     glm::vec3 lightDiffuse = glm::vec3(1, 1, 1)*diffuse;
 
-    
-
-    //printShader(bunny, contribution);
 
     //render loop
     while (!glfwWindowShouldClose(window))
@@ -127,8 +125,9 @@ int main()
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Model Size", &modelSize, 0.005f, 50.0f);
         //ImGui::SliderFloat("Brightness", &diffuse, 0.0f, 2.0f);
-        ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 20);
+        ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 19);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
+        ImGui::SliderFloat("Light by scale clamp coefficient", &clampCoef, 1.0f, 1000.0f);
         ImGui::End();
 
         
@@ -158,7 +157,7 @@ int main()
             // YOU NEED TO BIND PROGRAM WITH GLUSEPROGRAM BEFORE glUNIFORM
             //send contribution ki to shader as uniform (array)
             glUniform1fv(glGetUniformLocation(xShade, "contribution"), 20, contribution);
-            glUniform1f(glGetUniformLocation(xShade,"clampCoef"),10.0f);
+            glUniform1f(glGetUniformLocation(xShade,"clampCoef"),clampCoef);
             glUniform1i(glGetUniformLocation(xShade, "scales"), scales);
             }
 
@@ -175,7 +174,7 @@ int main()
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "view"), 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "projection"), 1, GL_FALSE, &projection[0][0]);
 
-        //printShader(bunny, contribution);
+        printShader(bunny, contribution);
 
         bunny.render(*currentShader);
 
@@ -241,7 +240,7 @@ void printShader(YJ yj, float contribution[]) {
         normal_ip1 = normalize(yj.smoothedNormalsSingleArr[(i + 1) * yj.smoothedNormals[i].size() + yj.smoothedNormals[i].size()/2]);
 
         light_ip1 = normalize(lightGlobal - dot(lightGlobal, normal_ip1) * normal_ip1);
-        c_i = glm::clamp(20 * dot(normal_i, light_ip1), -1.0f, 1.0f);
+        c_i = glm::clamp(clampCoef * dot(normal_i, light_ip1), -1.0f, 1.0f);
         detailTerms += contribution[i] * c_i;
         std::cout << "Contibution " << i << " at median vertex = " << contribution[i] << "\n";
         std::cout << "c_i at " << i << " at median vertex = " << c_i << "\n";
@@ -251,4 +250,5 @@ void printShader(YJ yj, float contribution[]) {
     col = (0.5f + 0.5f * (contribution[scales] * glm::dot(yj.smoothedNormalsSingleArr[scales * yj.smoothedNormals[0].size()], lightGlobal) + detailTerms)) * glm::vec4(textureColor, 1.0);
     std::cout << "Total detail terms = " << detailTerms << "\n";
     std::cout << "Final color of median vertex = " << col.x << ", " << col.y << ", " << col.z << "\n\n";
+    
 }
