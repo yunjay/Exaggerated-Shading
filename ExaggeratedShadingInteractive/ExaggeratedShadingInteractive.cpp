@@ -36,6 +36,7 @@ int scales=10; //b, num of scales
 float contributionScale = -0.5;
 GLfloat contribution[20]={0};//init to zeros
 GLfloat sigma[20];
+float ambient = 0.5;
 float clampCoef = 20.0;
 void printShader(YJ yj, float contribution[]);
 int main()
@@ -80,7 +81,7 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
 
-    glClearColor(30/255, 30/255, 30/255, 0.0); //background
+    glClearColor(30.0/255, 30.0/255, 30.0/255, 0.0); //background
     
     //Load Model=
     YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
@@ -128,6 +129,7 @@ int main()
         ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 19);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
         ImGui::SliderFloat("Light by scale clamp coefficient", &clampCoef, 1.0f, 1000.0f);
+        ImGui::SliderFloat("Ambient", &ambient, 0.0f, 1.0f);
         ImGui::End();
 
         
@@ -159,6 +161,7 @@ int main()
             glUniform1fv(glGetUniformLocation(xShade, "contribution"), 20, contribution);
             glUniform1f(glGetUniformLocation(xShade,"clampCoef"),clampCoef);
             glUniform1i(glGetUniformLocation(xShade, "scales"), scales);
+            glUniform1f(glGetUniformLocation(xShade, "ambient"), ambient);
             }
 
 
@@ -174,7 +177,7 @@ int main()
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "view"), 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "projection"), 1, GL_FALSE, &projection[0][0]);
 
-        printShader(bunny, contribution);
+        //printShader(bunny, contribution);
 
         bunny.render(*currentShader);
 

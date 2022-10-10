@@ -30,6 +30,7 @@ uniform float clampCoef;
 uniform int scales;
 uniform int size;
 uniform float contribution[20];
+uniform float ambient;
 
 void main() {
     gl_Position = projection * view *  model * vec4(aPos, 1.0f);
@@ -62,7 +63,8 @@ void main() {
         detailTerms+=contribution[i]*c_i;
     }
     //actual implementation
-    col=(0.5 + 0.5*(contribution[scales]*dot(normalize(smoothedNormals[gl_VertexID+scales*size]),lightGlobal)+detailTerms))*vec4(textureColor,1.0);
+    //col=(0.5 + 0.5*(contribution[scales]*dot(normalize(smoothedNormals[gl_VertexID+scales*size]),lightGlobal)+detailTerms))*vec4(textureColor,1.0);
+    col=(ambient + 0.5*(contribution[scales]*dot(normalize(smoothedNormals[gl_VertexID+scales*size]),lightGlobal)+detailTerms))*vec4(textureColor,1.0);
     
     //check normals, and indexing   
     //col = dot(smoothedNormals[gl_VertexID],lightGlobal)*vec4(textureColor,0.0);
@@ -78,4 +80,15 @@ void main() {
 
     //check contribution uniform
     //col = 2*contribution[0]*vec4(textureColor,0.0);
+
+    //check c_i
+    /*
+    int i=12;
+    normal_i=normalize(smoothedNormals[gl_VertexID+i*size]);
+    normal_ip1=normalize(smoothedNormals[gl_VertexID+(i+1)*size]);
+        
+    light_ip1=lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1;
+    c_i = clamp(clampCoef*dot(normal_i,light_ip1),-1.0,1.0);
+    col = (0.5+0.5*c_i)*vec4(textureColor,0.0);
+    */
 }
