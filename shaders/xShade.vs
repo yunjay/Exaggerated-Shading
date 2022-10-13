@@ -58,19 +58,15 @@ void main() {
         normal_i=normalize(smoothedNormals[gl_VertexID+i*size]);
         normal_ip1=normalize(smoothedNormals[gl_VertexID+(i+1)*size]);
         
-        light_ip1=lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1;
+        light_ip1=normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
         c_i = clamp(clampCoef*dot(normal_i,light_ip1),-1.0,1.0);
         detailTerms+=contribution[i]*c_i;
     }
-    //actual implementation
-    //col=(0.5 + 0.5*(contribution[scales]*dot(normalize(smoothedNormals[gl_VertexID+scales*size]),lightGlobal)+detailTerms))*vec4(textureColor,1.0);
+    //actual implementation    
     col=(ambient + 0.5*(contribution[scales]*dot(normalize(smoothedNormals[gl_VertexID+scales*size]),lightGlobal)+detailTerms))*vec4(textureColor,1.0);
     
     //check normals, and indexing   
-    //col = dot(smoothedNormals[gl_VertexID],lightGlobal)*vec4(textureColor,0.0);
-    //col = dot(smoothedNormals[gl_VertexID+size],lightGlobal)*vec4(textureColor,0.0);
-    //col = dot(smoothedNormals[gl_VertexID+size*10],lightGlobal)*vec4(textureColor,0.0);
-    //col = dot(smoothedNormals[gl_VertexID+size*19],lightGlobal)*vec4(textureColor,0.0);
+    //col=dot(normalize(smoothedNormals[gl_VertexID + size*(scales-1)]),lightGlobal)*vec4(textureColor,0.0);
 
     //check clampCoef
     //col = 0.1*clampCoef*vec4(textureColor,0.0);
@@ -82,12 +78,13 @@ void main() {
     //col = 2*contribution[0]*vec4(textureColor,0.0);
 
     //check c_i
+    
     /*
-    int i=12;
+    int i=scales-1;
     normal_i=normalize(smoothedNormals[gl_VertexID+i*size]);
     normal_ip1=normalize(smoothedNormals[gl_VertexID+(i+1)*size]);
         
-    light_ip1=lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1;
+    light_ip1=normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
     c_i = clamp(clampCoef*dot(normal_i,light_ip1),-1.0,1.0);
     col = (0.5+0.5*c_i)*vec4(textureColor,0.0);
     */

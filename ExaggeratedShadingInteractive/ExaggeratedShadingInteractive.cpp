@@ -83,9 +83,11 @@ int main()
 
     glClearColor(30.0/255, 30.0/255, 30.0/255, 0.0); //background
     
-    //Load Model=
-    YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
-    
+    //Load Model
+   //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
+    YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/Golf_Ball/Golf_Ball.yj");
+
+
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
     for (int i = 0; i < 20; i++) sigma[i] = 0.4 * featureSize(bunny.vertices) * glm::pow(glm::sqrt(2),float(i));
     
@@ -109,7 +111,8 @@ int main()
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
+        //yDegrees += 1;
+        //yDegrees =int(yDegrees)%360;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -124,16 +127,15 @@ int main()
         ImGui::Checkbox("Exaggerated Shading", &xOn);
         ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
-        ImGui::SliderFloat("Model Size", &modelSize, 0.005f, 50.0f);
+        ImGui::SliderFloat("Model Size", &modelSize, 0.005f, 500.0f);
         //ImGui::SliderFloat("Brightness", &diffuse, 0.0f, 2.0f);
         ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 19);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
-        ImGui::SliderFloat("Light by scale clamp coefficient", &clampCoef, 1.0f, 1000.0f);
+        ImGui::SliderFloat("Light by scale clamp coefficient", &clampCoef, 1.0f, 500.0f);
         ImGui::SliderFloat("Ambient", &ambient, 0.0f, 1.0f);
         ImGui::End();
 
         
-
         //contribution factor
         GLfloat contributionBeforeNorm[20]={0};
         GLfloat contributionSum = 0;
