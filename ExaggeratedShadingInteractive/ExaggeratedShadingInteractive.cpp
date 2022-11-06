@@ -32,7 +32,7 @@ bool xOn=true;
 float modelSize=10.0f;
 float diffuse = 1.0f;
 // Shading Variables
-int scales=10; //b, num of scales
+int scales=5; //b, num of scales
 float contributionScale = -0.5;
 GLfloat contribution[20]={0};//init to zeros
 GLfloat sigma[20];
@@ -84,13 +84,13 @@ int main()
     glClearColor(30.0/255, 30.0/255, 30.0/255, 0.0); //background
     
     //Load Model
-   //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
-    YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/Golf_Ball/Golf_Ball.yj");
+    //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
+    YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/golfball/GolfBallOBJ.yj");
 
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
     for (int i = 0; i < 20; i++) sigma[i] = 0.4 * featureSize(bunny.vertices) * glm::pow(glm::sqrt(2),float(i));
-    
+    glm::vec3 cen = center(bunny.vertices); std::cout << "Center of model : " << cen.x << ", " << cen.y << ", " << cen.x << "\n";
     //Load Shader
     GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
     GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
@@ -127,11 +127,11 @@ int main()
         ImGui::Checkbox("Exaggerated Shading", &xOn);
         ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
-        ImGui::SliderFloat("Model Size", &modelSize, 0.005f, 500.0f);
+        ImGui::SliderFloat("Model Size", &modelSize, 0.01f, 30.0f);
         //ImGui::SliderFloat("Brightness", &diffuse, 0.0f, 2.0f);
         ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 19);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
-        ImGui::SliderFloat("Light by scale clamp coefficient", &clampCoef, 1.0f, 500.0f);
+        ImGui::SliderFloat("Light by scale clamp coefficient", &clampCoef, 1.0f, 1000.0f);
         ImGui::SliderFloat("Ambient", &ambient, 0.0f, 1.0f);
         ImGui::End();
 
@@ -168,10 +168,11 @@ int main()
 
 
         glm::mat4 model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(0,-0.4, -1.0f));
-        model = glm::scale(model, glm::vec3(modelSize, modelSize, modelSize));
         model = glm::rotate(model, glm::radians(yDegrees), glm::vec3(0,1,0));
         model = glm::rotate(model, glm::radians(xDegrees), glm::vec3(1,0,0));
+        model = glm::scale(model, glm::vec3(modelSize, modelSize, modelSize));
+        model = glm::translate(model, glm::vec3(0,-0.4, -1.0f));
+        model = glm::translate(model, (-1.0f)*cen);
         glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0,0,-1), glm::vec3(0,1,0));
         glm::mat4 projection = glm::perspective(glm::radians(90.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
