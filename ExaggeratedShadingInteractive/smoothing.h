@@ -64,6 +64,20 @@ float featureSize(const vector<glm::vec3> vertices) {
 	//Better Implementation - SUB SAMPLING
 	return size;
 }
+glm::vec3 center(const vector<glm::vec3> vertices) {
+	//Intuitive implemetation calculating model boundary box size
+	float maxX = vertices[0].x, maxY = vertices[0].y, maxZ = vertices[0].z;
+	float minX = vertices[0].x, minY = vertices[0].y, minZ = vertices[0].z;
+	for (int i = 1; i < vertices.size(); i++) {
+		(vertices[i].x > maxX) ? maxX = vertices[i].x : 0;
+		(vertices[i].y > maxY) ? maxY = vertices[i].y : 0;
+		(vertices[i].z > maxZ) ? maxZ = vertices[i].z : 0;
+		(vertices[i].x < minX) ? minX = vertices[i].x : 0;
+		(vertices[i].y < minY) ? minY = vertices[i].y : 0;
+		(vertices[i].z < minZ) ? minZ = vertices[i].z : 0;
+	}
+	return glm::vec3((maxX+minX)/2.0f, (maxY + minY) / 2.0f, (maxZ + minZ) / 2.0f);
+}
 void smooth(const vector<glm::vec3> normals, vector<glm::vec3>& smoothed, const float invsigma2 ) {
 	cout << "Smoothing...\n";
 	auto start = std::chrono::high_resolution_clock::now();

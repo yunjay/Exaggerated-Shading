@@ -152,7 +152,7 @@ int main()
         if (!xOn)currentShader = &cosine;
         else currentShader = &xShade;
 
-        glUseProgram(*currentShader);
+        //glUseProgram(*currentShader);
 
         //Uniforms
         glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
