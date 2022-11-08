@@ -127,7 +127,7 @@ int main()
         ImGui::Checkbox("Exaggerated Shading", &xOn);
         ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
-        ImGui::SliderFloat("Model Size", &modelSize, 0.01f, 30.0f);
+        ImGui::SliderFloat("Model Size", &modelSize, 0.02f, 30.0f);
         //ImGui::SliderFloat("Brightness", &diffuse, 0.0f, 2.0f);
         ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 19);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);

@@ -6,42 +6,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 int loadingScales = 20;
-bool loadYJ(std::string path,
-	//passed by reference
-	std::vector<glm::vec3>& out_vertices,
-	std::vector<glm::vec3>& out_normals) {
-	//how to construct indicies for EBO..?
-	//maybe mix with assimp in usage as a quick hack
-	std::cout << "Loading .yj file : " << path << "\n";
-	//std::vector<glm::vec3> vertices;
-	//std::vector<glm::vec3> normals;
-	std::ifstream infile(path);
-	glm::vec3 vec(0.0f);
-	char header;
-	float x, y, z;
-	while (infile >> header >> x >> y >> z) {
-		if (header == 'v') {
-			vec = glm::vec3(x, y, z);
-			//vertices.push_back(vec);
-			out_vertices.push_back(vec);
-		}
-		else if (header == 'n') {
-			vec = glm::vec3(x, y, z);
-			//normals.push_back(vec);
-			out_normals.push_back(vec);
-		}
-		else if (header == 'i') {
-			//normals.push_back(vec);
-			
-		}
-		else return false;
-	}
-
-	//out_vertices=vertices;
-	//out_normals=normals;
-
-	return true;
-}
 bool loadNormalsYJ(std::string path,
 	//passed by reference
 	std::vector<glm::vec3>& out_normals) {
@@ -118,14 +82,16 @@ public:
 			}
 			else if (header == 'i') {
 				//normals.push_back(vec);
-				indices.push_back(x);
+				indices.push_back((unsigned int)x);
 			}
 			else return false;
 		}
 
 		//out_vertices=vertices;
 		//out_normals=normals;
-
+		std::cout << "Size of vertices : " << vertices.size() << "\n";
+		std::cout << "Size of normals : " << normals.size() << "\n";
+		std::cout << "Size of indices : " << indices.size() << "\n";
 		return true;
 	}
 	//load preprocessed smoothed normals
@@ -172,7 +138,7 @@ public:
 		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 		
 		//EBO
-		glBindBuffer(GL_ARRAY_BUFFER, EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
 
@@ -188,7 +154,7 @@ public:
 		glEnableVertexAttribArray(2);
 		glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glBindBuffer(GL_ARRAY_BUFFER,0);
+		
 		
 		//SEND SMOOTHED NORMALS TO SHADER
 		//SSBO //smoothedNormalsBuffer is GLuint ID
@@ -201,6 +167,7 @@ public:
 		glBufferData(GL_SHADER_STORAGE_BUFFER, 20*smoothedNormals[0].size()*sizeof(glm::vec4), smoothedNormalsSingleArr, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER,4,smoothedNormalsBuffer);
 		
+		glBindBuffer(GL_ARRAY_BUFFER,0);
 		glBindVertexArray(0);
 
 		std::cout << "Ready to render.\n";
@@ -216,8 +183,10 @@ public:
 		
 		glUseProgram(shader);
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, &indices[0]);
 		
+		//glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, &indices[0]);
+		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+
 		//glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 		//glDrawArrays(GL_TRIANGLE_FAN, 0, vertices.size());
 
