@@ -184,10 +184,13 @@ public:
 		glUseProgram(shader);
 		glBindVertexArray(VAO);
 		
-		//glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, &indices[0]);
 		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
 
+		//glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, &indices[0]);
+
+
 		//glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+		
 		//glDrawArrays(GL_TRIANGLE_FAN, 0, vertices.size());
 
 		//glDisableVertexAttribArray(0);

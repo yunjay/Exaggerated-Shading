@@ -17,8 +17,8 @@
 #include "smoothing.h"
 
 // settings
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 900;
+const unsigned int SCR_WIDTH = 3200;
+const unsigned int SCR_HEIGHT = 1800;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 // timing
@@ -84,17 +84,20 @@ int main()
     glClearColor(30.0/255, 30.0/255, 30.0/255, 0.0); //background
     
     //Load Model
-    //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
-    YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/golfball/GolfBallOBJ.yj");
+    YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
+    //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/golfball/GolfBallOBJ.yj");
 
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
-    for (int i = 0; i < 20; i++) sigma[i] = 0.4 * featureSize(bunny.vertices) * glm::pow(glm::sqrt(2),float(i));
+    float feature = featureSize(bunny.vertices);
+    cout << "Feature size of model : " << feature << "\n";
+    for (int i = 0; i < 20; i++) sigma[i] = 0.4 * feature * glm::pow(glm::sqrt(2),float(i));
     glm::vec3 cen = center(bunny.vertices); std::cout << "Center of model : " << cen.x << ", " << cen.y << ", " << cen.x << "\n";
     //Load Shader
     GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
     GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
     GLuint softToon = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/softToon.fs");
+    GLuint principalDirections=loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.fs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.gs");
     GLuint* currentShader=&xShade;
 
     //view
@@ -127,7 +130,7 @@ int main()
         ImGui::Checkbox("Exaggerated Shading", &xOn);
         ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
-        ImGui::SliderFloat("Model Size", &modelSize, 0.02f, 30.0f);
+        ImGui::SliderFloat("Model Size", &modelSize, 0.05f, 500.0f);
         //ImGui::SliderFloat("Brightness", &diffuse, 0.0f, 2.0f);
         ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 19);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
@@ -152,7 +155,7 @@ int main()
         if (!xOn)currentShader = &cosine;
         else currentShader = &xShade;
 
-        //glUseProgram(*currentShader);
+        glUseProgram(*currentShader);
 
         //Uniforms
         glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
@@ -164,15 +167,15 @@ int main()
             glUniform1f(glGetUniformLocation(xShade,"clampCoef"),clampCoef);
             glUniform1i(glGetUniformLocation(xShade, "scales"), scales);
             glUniform1f(glGetUniformLocation(xShade, "ambient"), ambient);
-            }
+        }
 
-
+        //opengl matrice transforms are applied from the right side. (last first)
         glm::mat4 model = glm::mat4(1);
-        model = glm::rotate(model, glm::radians(yDegrees), glm::vec3(0,1,0));
-        model = glm::rotate(model, glm::radians(xDegrees), glm::vec3(1,0,0));
-        model = glm::scale(model, glm::vec3(modelSize, modelSize, modelSize));
         model = glm::translate(model, glm::vec3(0,-0.4, -1.0f));
         model = glm::translate(model, (-1.0f)*cen);
+        model = glm::scale(model, glm::vec3(modelSize, modelSize, modelSize));
+        model = glm::rotate(model, glm::radians(yDegrees), glm::vec3(0,1,0));
+        model = glm::rotate(model, glm::radians(xDegrees), glm::vec3(1,0,0));
         glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0,0,-1), glm::vec3(0,1,0));
         glm::mat4 projection = glm::perspective(glm::radians(90.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
@@ -184,6 +187,13 @@ int main()
 
         bunny.render(*currentShader);
 
+        glUseProgram(principalDirections);
+        glUniform1f(glGetUniformLocation(principalDirections,"magnitude"), 0.001*feature);
+        glUniformMatrix4fv(glGetUniformLocation(principalDirections, "model"), 1, GL_FALSE, &model[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(principalDirections, "view"), 1, GL_FALSE, &view[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(principalDirections, "projection"), 1, GL_FALSE, &projection[0][0]);
+
+        //bunny.render(principalDirections);
 
 
 
