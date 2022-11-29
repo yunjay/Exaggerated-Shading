@@ -86,7 +86,7 @@ int main()
     //Load Model
     YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
     //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/golfball/GolfBallOBJ.yj");
-
+    //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/lucy/lucy.yj");
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
     float feature = featureSize(bunny.vertices);

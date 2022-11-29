@@ -1,0 +1,3 @@
+C:\Users\yunjay\Desktop\Projects\ExaggeratedShadingInteractive\ExaggeratedShadingInteractive\x64\Debug\ExaggeratedShadingInteractive.vcxproj.CopyComplete
+C:\Users\yunjay\Desktop\Projects\ExaggeratedShadingInteractive\ExaggeratedShadingInteractive\x64\Debug\ExaggeratedShadingInteractive.exe
+C:\Users\yunjay\Desktop\Projects\ExaggeratedShadingInteractive\ExaggeratedShadingInteractive\x64\Debug\glfw3.dll
