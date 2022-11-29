@@ -84,8 +84,10 @@ int main()
     glClearColor(30.0/255, 30.0/255, 30.0/255, 0.0); //background
     
     //Load Model
-    YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
+    //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
     //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/golfball/GolfBallOBJ.yj");
+    //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/lucy/lucy.yj");
+    YJ bunny(".\\bunny\\stanford-bunny.yj");
 
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
@@ -93,11 +95,16 @@ int main()
     cout << "Feature size of model : " << feature << "\n";
     for (int i = 0; i < 20; i++) sigma[i] = 0.4 * feature * glm::pow(glm::sqrt(2),float(i));
     glm::vec3 cen = center(bunny.vertices); std::cout << "Center of model : " << cen.x << ", " << cen.y << ", " << cen.x << "\n";
-    //Load Shader
+    
+    //Load Shaders
     GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
     GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
     GLuint softToon = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/softToon.fs");
-    GLuint principalDirections=loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.fs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.gs");
+    //GLuint principalDirections=loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.fs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.gs");
+    
+
+    
+    
     GLuint* currentShader=&xShade;
 
     //view
@@ -186,12 +193,13 @@ int main()
         //printShader(bunny, contribution);
 
         bunny.render(*currentShader);
-
+        /*
         glUseProgram(principalDirections);
         glUniform1f(glGetUniformLocation(principalDirections,"magnitude"), 0.001*feature);
         glUniformMatrix4fv(glGetUniformLocation(principalDirections, "model"), 1, GL_FALSE, &model[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(principalDirections, "view"), 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(principalDirections, "projection"), 1, GL_FALSE, &projection[0][0]);
+        */
 
         //bunny.render(principalDirections);
 
