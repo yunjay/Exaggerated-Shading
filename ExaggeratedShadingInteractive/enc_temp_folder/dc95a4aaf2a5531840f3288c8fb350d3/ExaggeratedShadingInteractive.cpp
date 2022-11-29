@@ -95,16 +95,11 @@ int main()
     cout << "Feature size of model : " << feature << "\n";
     for (int i = 0; i < 20; i++) sigma[i] = 0.4 * feature * glm::pow(glm::sqrt(2),float(i));
     glm::vec3 cen = center(bunny.vertices); std::cout << "Center of model : " << cen.x << ", " << cen.y << ", " << cen.x << "\n";
-    
-    //Load Shaders
+    //Load Shader
     GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
     GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
     GLuint softToon = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/softToon.fs");
     //GLuint principalDirections=loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.fs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.gs");
-    
-
-    
-    
     GLuint* currentShader=&xShade;
 
     //view

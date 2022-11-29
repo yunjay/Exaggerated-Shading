@@ -53,22 +53,26 @@ public:
 	//std::vector<glm::vec3[20]> smoothedNormalsResized; -> YOU CAN'T MAKE A VECTOR OF PLAIN ARRAYS
 	glm::vec4* smoothedNormalsSingleArr;
 	bool isSet = false;
+
 	YJ(std::string path ) {
 		this->path = path;
 		loadYJ(path);
 		loadSmoothedNormals();
 		//setupYJ(vertices, normals);
 	}
+
 	bool loadYJ(std::string path) {
 		//how to construct indicies for EBO..?
 		//maybe mix with assimp in usage as a quick hack
 		std::cout << "Loading .yj file : " << path << "\n";
 		//std::vector<glm::vec3> vertices;
 		//std::vector<glm::vec3> normals;
+
 		std::ifstream infile(path);
 		glm::vec3 vec(0.0f);
 		char header;
 		float x, y, z;
+		
 		while (infile >> header >> x >> y >> z) {
 			if (header == 'v') {
 				vec = glm::vec3(x, y, z);
