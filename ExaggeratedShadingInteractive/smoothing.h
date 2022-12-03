@@ -60,7 +60,7 @@ float featureSize(const vector<glm::vec3> vertices) {
 	float diagonalLength = glm::length(diagonal);
 	//cout << "Diagonal length of box bounding model : "<<diagonalLength<<"\n";
 	//arbitrary denominator
-	size = diagonalLength/50.0f;
+	size = diagonalLength/1000.0f;
 	//size = diagonalLength / 10.0f;
 	//Better Implementation - SUB SAMPLING
 	return size;

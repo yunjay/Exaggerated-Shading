@@ -100,7 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\yunjay\Desktop\Projects\ExaggeratedShadingInteractive\imgui;C:\Users\yunjay\Desktop\Projects\ExaggeratedShadingInteractive;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\yunjay\Desktop\Projects\ExaggeratedShadingInteractive\imgui;C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\imgui;C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

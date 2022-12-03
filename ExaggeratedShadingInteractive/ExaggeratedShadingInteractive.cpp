@@ -84,14 +84,13 @@ int main()
     glClearColor(30.0/255, 30.0/255, 30.0/255, 0.0); //background
     
     //Load Model
-    //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/bunny/stanford-bunny.yj");
-    //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/golfball/GolfBallOBJ.yj");
-    //YJ bunny("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/ExaggeratedShadingInteractive/lucy/lucy.yj");
-    YJ bunny(".\\bunny\\stanford-bunny.yj");
-
+    // //YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
+    //YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
+    YJ bunny(".\\models\\lucy\\lucy.yj");
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
     float feature = featureSize(bunny.vertices);
+    float modelScaleFactor = feature * 1000;
     cout << "Feature size of model : " << feature << "\n";
     for (int i = 0; i < 20; i++) sigma[i] = 0.4 * feature * glm::pow(glm::sqrt(2),float(i));
     glm::vec3 cen = center(bunny.vertices); std::cout << "Center of model : " << cen.x << ", " << cen.y << ", " << cen.x << "\n";
@@ -137,7 +136,7 @@ int main()
         ImGui::Checkbox("Exaggerated Shading", &xOn);
         ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
-        ImGui::SliderFloat("Model Size", &modelSize, 0.05f, 500.0f);
+        ImGui::SliderFloat("Model Size", &modelSize, 0.01f, 100.0f);
         //ImGui::SliderFloat("Brightness", &diffuse, 0.0f, 2.0f);
         ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 19);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
@@ -168,7 +167,7 @@ int main()
         glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
         if (xOn) {
-            // YOU NEED TO BIND PROGRAM WITH GLUSEPROGRAM BEFORE glUNIFORM
+            // YOU NEED TO BIND PROGRAM WITH glUseProgram BEFORE glUniform
             //send contribution ki to shader as uniform (array)
             glUniform1fv(glGetUniformLocation(xShade, "contribution"), 20, contribution);
             glUniform1f(glGetUniformLocation(xShade,"clampCoef"),clampCoef);
@@ -178,8 +177,9 @@ int main()
 
         //opengl matrice transforms are applied from the right side. (last first)
         glm::mat4 model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(0,-0.4, -1.0f));
-        model = glm::translate(model, (-1.0f)*cen);
+        model = glm::translate(model, glm::vec3(0,0.0, -1.0f));
+        //model = glm::translate(model, (-1.0f) * cen);
+        model = glm::scale(model, glm::vec3(1.0/modelScaleFactor, 1.0 / modelScaleFactor, 1.0 / modelScaleFactor));
         model = glm::scale(model, glm::vec3(modelSize, modelSize, modelSize));
         model = glm::rotate(model, glm::radians(yDegrees), glm::vec3(0,1,0));
         model = glm::rotate(model, glm::radians(xDegrees), glm::vec3(1,0,0));
