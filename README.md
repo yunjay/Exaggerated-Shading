@@ -50,10 +50,11 @@ $$l_{i+1} = l_{global} - n_{i+1} ( n_{i+1{}} \cdot l_{global} )$$
 
 $$ c = \frac{1}{2} + \frac{1}{2} (  k_b (n_b \cdot l_{global}) + \sum_{i=0}^{b-1}k_i c_i ) $$
 
-The [clamp()](https://thebookofshaders.com/glossary/?search=clamp) function is used for "smooth cel shading". Used with coefficient $a$, the exaggeration factor for sending values to extreme values of -1 or 1, the clamp functions as a "smooth" version of cel shading where most values are set discretely to either -1 or 1, but still has a continuous transition through -1 and 1.
+The *[clamp()](https://thebookofshaders.com/glossary/?search=clamp)* function is used for "smooth cel shading". Used with coefficient $a$, the exaggeration factor for sending values to extreme values of -1 or 1, the clamp functions as a "smooth" version of cel shading where most values are set discretely to either -1 or 1, but still has a continuous transition through -1 and 1.
 
 $l_{i+1}$ is calculated by projecting the global light direction onto the tangent plane of the next smoothed normal, resulting in a light with "grazing" position relative to the current normal, as in a almost perpendicular position for vertices at ridges or valleys.
 
+Then $c$ is calculated as a weighted sum of lightings at all scales. This results in an image that **displays details of the object** at **all detail frequencies**, **independent of surface orientation** to the light source, similar to a map made to display terrain relief.
 
 ### Principal Direction-based Light Adjustment
 
