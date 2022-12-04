@@ -1,7 +1,3 @@
-<script
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-  type="text/javascript">
-</script>
 
 # Exaggerated Shading Interactive
 Interactive OpenGL program implementing [Xshade](https://pixl.cs.princeton.edu/pubs/Rusinkiewicz_2006_ESF/exaggerated_shading.pdf) 
