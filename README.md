@@ -41,20 +41,33 @@ The adjusted light intensity for exaggerated shading of details is implemented a
 
 $c_i$ represents light at each scale.
 
-$n_i$ is the surface normal at the current scale, and $n_{i+1}$
-$l_{i+1}$ is the direction of light used at each scale, $c$ is the result intensity of each vertex :
+$n_i$ is the surface normal at the current scale, and $n_{i+1}$ is the surface normal at the next smoothed frequency. $ n_b $ is the normal of the "base" scale, or the scale with smallest detail.
+
+$l_{i+1}$ is the direction of light used at each scale, and $l_{global}$ is the "global" light direction, or general light direction of the rendered scene.
+
+$c$ is the result intensity of each vertex.
+
+$k$ is the respective weighted "contribution" coefficient of each scale, indicating whether we want to put emphasis on scales at larger frequencies or lower frequencies. The paper suggests a contribution factor relative to an exponent of $\sigma$ at each scale. The sum of all $k$ must be unit size.
 
 $$c_i = \underset{[-1,1]}{clamp}(a(n_i \cdot l_{i+1}))$$
-$$l_{i+1} = l_{global}$$
+
+$$l_{i+1} = l_{global} - n_{i+1} ( n_{i+1{}} \cdot l_{global} )$$
+
+$$ c = \frac{1}{2} + \frac{1}{2} (  k_b (n_b \cdot l_{global}) + \sum_{i=0}^{b-1}k_i c_i ) $$
 
 The [clamp()](https://thebookofshaders.com/glossary/?search=clamp) function is used for "smooth cel shading". Used with coefficient $a$, the exaggeration factor for sending values to extreme values of -1 or 1, the clamp functions as a "smooth" version of cel shading where most values are set discretely to either -1 or 1, but still has a continuous transition through -1 and 1.
 
-
+$l_{i+1}$ is calculated by projecting the global light direction onto the tangent plane of the next smoothed normal, resulting in a light with "grazing" position relative to the current normal, as in a almost perpendicular position for vertices at ridges or valleys.
 
 
 ### Principal Direction-based Light Adjustment
 
 The basic rendering model simply projects the light source at each point into the tangent plane perpendicular to the smoothed normal. Instead with a formulization of "contrast" proposed in the paper as 
+
+## Implemented Interactive Features
+
+The paper, published in 2006, renders these exaggerated shadings of 3D objects as images. Currently this method can be easily rendered in realtime with interactive controls for the user controlled hyperparameters provided in the paper.
+
 
 
 
