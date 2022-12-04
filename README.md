@@ -6,11 +6,13 @@ ACM Transactions on Graphics (Proc. SIGGRAPH) 25(3), July 2006.).
 
 ![Demo](./images/demo.gif)
 
+*Rendering of the 3D object with exaggerated details independent of light orientation can be seen*
+
 # Method
 
 *Exaggerated Shading for Depicting Shape and Detail* proposes an original shading technique for revealing details at all frequencies, independent of light position and surface orientation. 
 
-This shading method is introduced as a form of "Multiscale local toon shading", and is based off of techniques used in **cartographic terrain relief**.
+This shading method is introduced as a form of "Multiscale local toon shading", and is based off of principle techniques used in **cartographic terrain relief**.
 
 ## Key Ideas
 
@@ -19,6 +21,14 @@ This shading method is introduced as a form of "Multiscale local toon shading", 
 2. Lighting is computed at multiple scales using surface normals smoothed by different amounts to convey overall shape and details at different frequencies.
 
 3. Light direction varies as if it is always at a **grazing** position with respect to the overall orientation of that part of the object, bringing out detail of the object.
+
+### Principles of Cartographic Shaded Relief
+
+1. Shadows and specular reflections are omiited.
+2. Lighting should broadly seem to appear to originate from the top of the image. (Usually the upper left direction.)
+3. The origin direction of light can be locally adjusted. If a mountain curves on the map, one side of the map should be uniformly light and the other uniformly dark, regardless of the orientation to the light source.
+4. Height should be exaggerated, and ridges and valleys should have sharp transitions in brightness.
+5. The shaded image should be a blend between the original rendering and the smoothed version.
 
 ## Implementation
 
