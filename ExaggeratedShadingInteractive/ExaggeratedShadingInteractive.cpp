@@ -17,8 +17,8 @@
 #include "smoothing.h"
 
 // settings
-const unsigned int SCR_WIDTH = 3200;
-const unsigned int SCR_HEIGHT = 1800;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 1600;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 // timing
@@ -32,15 +32,16 @@ bool xOn=true;
 float modelSize=1.0f;
 float diffuse = 1.0f;
 float lightDegrees = 0.0f;
+glm::vec3 background(30.0 / 255, 30.0 / 255, 30.0 / 255);
 
 // Shading Variables
-int scales=5; //b, num of scales
+int scales=10; //b, num of scales
 float contributionScale = -0.5;
 GLfloat contribution[20]={0};//init to zeros
 GLfloat sigma[20];
 float ambient = 0.5;
 float clampCoef = 20.0;
-void printShader(YJ yj, float contribution[]);
+
 int main()
 {
     //xOn = false;
@@ -83,20 +84,21 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
 
-    glClearColor(30.0/255, 30.0/255, 30.0/255, 0.0); //background
-    
+
     //Load Model
     // //YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
-    YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
-    //YJ bunny(".\\models\\lucy\\lucy.yj");
+    //YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
+    YJ bunny(".\\models\\lucy\\lucy.yj");
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
     float feature = featureSize(bunny.vertices);
     float modelScaleFactor = feature * 1000;
     cout << "Feature size of model : " << feature << "\n";
     for (int i = 0; i < 20; i++) sigma[i] = 0.4 * feature * glm::pow(glm::sqrt(2),float(i));
-    glm::vec3 cen = center(bunny.vertices); std::cout << "Center of model : " << cen.x << ", " << cen.y << ", " << cen.x << "\n";
-    
+    glm::vec3 cen = center(bunny.vertices); cout << "Center of model : " << cen.x << ", " << cen.y << ", " << cen.x << "\n";
+    cout << "Diagonal Size of Model : "<< modelScaleFactor <<"\n";
+
+
     //Load Shaders
     GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
     GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
@@ -109,9 +111,10 @@ int main()
     GLuint* currentShader=&xShade;
 
     //view
-    glm::vec3 cameraPos = glm::vec3(0, 0.0, 1);
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
     //light settings
-    glm::vec3 lightPos = glm::vec3(-1, 1, 1);
+    glm::vec3 lightPosInit = glm::vec3(-1.0f, 1.0f, 1.5f);
+    glm::vec3 lightPos = lightPosInit;
     glm::vec3 lightDiffuse = glm::vec3(1, 1, 1)*diffuse;
 
 
@@ -124,6 +127,9 @@ int main()
         lastFrame = currentFrame;
         //yDegrees += 1;
         //yDegrees =int(yDegrees)%360;
+
+        glClearColor(background.x, background.y, background.z, 0.0); //background
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -138,13 +144,16 @@ int main()
         ImGui::Checkbox("Exaggerated Shading", &xOn);
         ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
-        ImGui::SliderFloat("Model Size", &modelSize, 0.01f, 100.0f);
+        ImGui::SliderFloat("Model Size", &modelSize, 0.1f, 10.0f);
         ImGui::SliderFloat("Rotate Global Light Source", &lightDegrees, 0.0f, 360.0f);
         //ImGui::SliderFloat("Brightness", &diffuse, 0.0f, 2.0f);
-        ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 19);
+        ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 20);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
-        ImGui::SliderFloat("Light by scale clamp coefficient", &clampCoef, 1.0f, 1000.0f);
+        ImGui::SliderFloat("Clamp Coefficient for Light at Each Scale", &clampCoef, 1.0f, 1000.0f);
         ImGui::SliderFloat("Ambient", &ambient, 0.0f, 1.0f);
+        ImGuiColorEditFlags misc_flags = (0 | ImGuiColorEditFlags_NoDragDrop | 0 | ImGuiColorEditFlags_NoOptions);
+        ImGui::ColorEdit3("Background Color", (float*)&background, misc_flags);
+
         ImGui::End();
 
         
@@ -167,6 +176,9 @@ int main()
         glUseProgram(*currentShader);
 
         //Uniforms
+        glm::mat4 lightRotate = glm::rotate(glm::mat4(1), glm::radians(lightDegrees), glm::vec3(0.0f, 1.0f, 0.0f));
+        lightPos = glm::vec3(lightRotate * glm::vec4(lightPosInit, 0.0f));
+
         glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
         if (xOn) {
@@ -181,14 +193,19 @@ int main()
         //opengl matrice transforms are applied from the right side. (last first)
         glm::mat4 model = glm::mat4(1);
         //model = glm::translate(model, glm::vec3(0,0.0, -1.0f));
-        model = glm::translate(model, (-1.0f) * cen + glm::vec3(0.0,-0.5,-1.0f));
-        model = glm::scale(model, glm::vec3(1.0/modelScaleFactor, 1.0 / modelScaleFactor, 1.0 / modelScaleFactor));
+        //model = glm::translate(model, ((-1.0f) * 1.0f / modelScaleFactor) * cen + glm::vec3(0.0,-0.5,-1.0f));
+        
+        //model = glm::translate(model, glm::vec3(0.0f, -0.5f, -1.0f));
+        model = glm::translate(model, glm::vec3(0.0f,0.0f,-1.0f));
         model = glm::scale(model, glm::vec3(modelSize, modelSize, modelSize));
-        model = glm::rotate(model, glm::radians(yDegrees), glm::vec3(0,1,0));
-        model = glm::rotate(model, glm::radians(xDegrees), glm::vec3(1,0,0));
+        model = glm::rotate(model, glm::radians(yDegrees), glm::vec3(0.0f,1.0f,0.0f));
+        model = glm::rotate(model, glm::radians(xDegrees), glm::vec3(1.0f,0.0f,0.0f));
+       
+        model = glm::scale(model, glm::vec3(1.0f / modelScaleFactor, 1.0f / modelScaleFactor, 1.0f / modelScaleFactor));
+        model = glm::translate(model, (-1.0f * cen));
         //glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0,0,-1), glm::vec3(0,1,0));
-        glm::mat4 view = glm::lookAt(cameraPos, (-1.0f) * cen + glm::vec3(0.0, 0.0, -1.0f), glm::vec3(0.0, 1.0, 0.0));
-        glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view = glm::lookAt(cameraPos,  glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "model"), 1, GL_FALSE, &model[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "view"), 1, GL_FALSE, &view[0][0]);
@@ -197,6 +214,7 @@ int main()
         //printShader(bunny, contribution);
 
         bunny.render(*currentShader);
+
         /*
         glUseProgram(principalDirections);
         glUniform1f(glGetUniformLocation(principalDirections,"magnitude"), 0.001*feature);
@@ -235,48 +253,4 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
-}
-
-void printShader(YJ yj, float contribution[]) {
-    glm::vec3 textureColor = glm::vec3(0.95,0.95,0.95);
-    glm::vec4 light_ip1;
-    glm::vec4 normal_i;
-    glm::vec4 normal_ip1;
-    glm::vec4 lightGlobal = glm::vec4(normalize(glm::vec3(-1, 1, 1)),0.0f);
-    float detailTerms=0.0;
-    float c_i=0.0;
-    for(int i=0;i<scales;i++){
-        //load smoothed normals
-        normal_i=glm::normalize(yj.smoothedNormalsSingleArr[i*yj.smoothedNormals[i].size()]);
-        normal_ip1= glm::normalize(yj.smoothedNormalsSingleArr[(i+1)*yj.smoothedNormals[i].size()]);
-        
-        light_ip1= glm::normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
-        c_i = glm::clamp(20*dot(normal_i,light_ip1),-1.0f,1.0f);
-        detailTerms+=contribution[i]*c_i;
-        std::cout << "Contibution " << i << " at first vertex = " << contribution[i] << "\n";
-        std::cout << "c_i at " << i << " at first vertex = " << c_i << "\n";
-        std::cout << "Detail term " << i << " at first vertex = " << contribution[i] * c_i << "\n";
-    }
-
-    glm::vec4 col=(0.5f + 0.5f*(contribution[scales]*glm::dot(glm::normalize(yj.smoothedNormalsSingleArr[scales* yj.smoothedNormals[0].size()]),lightGlobal)+detailTerms))*glm::vec4(textureColor,1.0);
-    std::cout << "Total detail terms = " << detailTerms << "\n";
-    std::cout << "Final color of first vertex = " << col.x<<", "<<col.y<<", "<<col.z << "\n\n";
-
-    for (int i = 0; i < scales; i++) {
-        //load smoothed normals
-        normal_i = glm::normalize(yj.smoothedNormalsSingleArr[i * yj.smoothedNormals[i].size()+ yj.smoothedNormals[i].size()/2]);
-        normal_ip1 = normalize(yj.smoothedNormalsSingleArr[(i + 1) * yj.smoothedNormals[i].size() + yj.smoothedNormals[i].size()/2]);
-
-        light_ip1 = normalize(lightGlobal - dot(lightGlobal, normal_ip1) * normal_ip1);
-        c_i = glm::clamp(clampCoef * dot(normal_i, light_ip1), -1.0f, 1.0f);
-        detailTerms += contribution[i] * c_i;
-        std::cout << "Contibution " << i << " at median vertex = " << contribution[i] << "\n";
-        std::cout << "c_i at " << i << " at median vertex = " << c_i << "\n";
-        std::cout << "Detail term " << i << " at median vertex = " << contribution[i] * c_i << "\n";
-    }
-
-    col = (0.5f + 0.5f * (contribution[scales] * glm::dot(yj.smoothedNormalsSingleArr[scales * yj.smoothedNormals[0].size()], lightGlobal) + detailTerms)) * glm::vec4(textureColor, 1.0);
-    std::cout << "Total detail terms = " << detailTerms << "\n";
-    std::cout << "Final color of median vertex = " << col.x << ", " << col.y << ", " << col.z << "\n\n";
-    
 }
