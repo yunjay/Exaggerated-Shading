@@ -6,9 +6,9 @@ ACM Transactions on Graphics (Proc. SIGGRAPH) 25(3), July 2006.).
 
 ![Demo](./images/demo.gif)
 
-*Rendering of the 3D object with exaggerated details independent of light orientation can be seen*
+*Rendering of the 3D object with exaggerated details independent of light orientation can be seen.*
 
-# Method
+## Method
 
 *Exaggerated Shading for Depicting Shape and Detail* proposes an original shading technique for revealing details at all frequencies, independent of light position and surface orientation. 
 
@@ -88,7 +88,33 @@ Therefore, we come to the conclusion that maximum contrast, by our definition, i
 
 The paper, published in 2006, renders these exaggerated shadings of 3D objects as images. Currently this method can be easily rendered in realtime with interactive controls for the user controlled hyperparameters provided in the paper.
 
-**Features**
+### Features
+
+- Model rotation and size.
+
+
+
+- Rotation of "global" light direction.
+
+
+
+- Number of Smoothing Scales to use in rendering.
+
+
+
+- Exponent to $\sigma$ of the contribution factor for each scale. A low factor will make the contribution of lower frequencies larger, emphasizing small details in the image. Vice versa a higher factor will make the contribution of larger frequencies higher, emphasizing large details and making the shading more smooth and less detailed.
+
+
+
+- Clamp Coefficient $a$ for the "soft cel shading" implemented with *clamp()*.
+
+
+
+- Ambient factor added to all lighting.
+
+
+
+- Background Color.
 
 
 
