@@ -87,8 +87,8 @@ int main()
 
     //Load Model
     // //YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
-    //YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
-    YJ bunny(".\\models\\lucy\\lucy.yj");
+    YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
+    //YJ bunny(".\\models\\lucy\\lucy.yj");
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
     float feature = featureSize(bunny.vertices);
