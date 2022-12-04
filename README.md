@@ -4,10 +4,11 @@ Interactive OpenGL program implementing [Xshade](https://pixl.cs.princeton.edu/p
 *Exaggerated Shading for Depicting Shape and Detail.*
 ACM Transactions on Graphics (Proc. SIGGRAPH) 25(3), July 2006.
 
-|:-:|:-:|
+|Standard Cosine Shading|**Exaggerated Shading**|
+|:---------------------:|:---------------------:|
 |![Before1](images/before1.png)|![After1](images/after1.png)|
 |![Before2](images/before2.png)|![After2](images/after2.png)|
-|:-:|:-:|
+
 *Rendering of the 3D object with exaggerated details independent of light orientation can be seen.*
 
 ## Method
