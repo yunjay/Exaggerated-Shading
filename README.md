@@ -29,7 +29,7 @@ This shading method is introduced as a form of "Multiscale local toon shading", 
 
 The shading method proposed in the paper requires several levels of smoothed normals to be preprocessed, each using a progressively larger Gaussian filter for smoothing of the normals.
 
-For each scale, the standard deviation of the Gaussian filter is increased exponentially by a constant scalar coefficient. The paper suggests $\sqrt(2)$ for each level.
+For each scale, the standard deviation of the Gaussian filter is increased exponentially by a constant scalar coefficient. The paper suggests $\sqrt{2}$ for each level.
 
 $ \sigma_{n+1} = \sqrt(2)\sigma_n $
 
