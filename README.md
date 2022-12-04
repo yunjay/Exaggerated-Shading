@@ -33,6 +33,12 @@ For each scale, the standard deviation of the Gaussian filter is increased expon
 
 $$ \sigma_{n+1} = \sqrt{2}\sigma_n $$
 
+As an implementation I've made [a seperate repository](https://github.com/yunjay/YJFileCreator) for preprocessing and saving the smoothed normals of a 3D object at each scale. 
+
+With theses smoothed normals, the light direction is adjusted at smoothing per vertex and per scale to attenuate detail at all frequencies.
+
+When $\c_i$ represents light at each scale, and s
+
 
 
 
