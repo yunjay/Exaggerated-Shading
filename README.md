@@ -74,7 +74,7 @@ $$ contrast = || \nabla (n \cdot \delta) || $$
 
 $n$ is the surface normal at each scale, and $\delta$ is the direction of the light source.
 
-This is intuitively understandable as the gradient $\nabla$ indicates the direction of largest change, and the dot product $ n\cdot \delta $ is what determines the diffuse factor of light intensity in shading. Thus the size of the gradient can be seen as the level of "contrast" in the rendered scene.
+This is intuitively understandable as the gradient $\nabla$ indicates the direction of largest change, and the dot product $n\cdot\delta$ is what determines the diffuse factor of light intensity in shading. Thus the size of the gradient can be seen as the level of "contrast" in the rendered scene.
 
 The paper references identities by do Carmo, 1976 that show an equivalence of this norm of gradient to :
 
