@@ -68,9 +68,9 @@ This is intuitively understandable as the gradient $\nabla$ indicates the direct
 
 The paper references identities by do Carmo, 1976 that show an equivalence of this norm of gradient to :
 
-$$ || \rom{2} \delta || = \sqrt{ 2H\kappa_\delta - K } $$
+$$ || \RomanNumeralCaps{2} \delta || = \sqrt{ 2H\kappa_\delta - K } $$
 
-where $\rom{2}$ is the second fundamental tensor, $H$ is mean curvature, $K$ is Gaussian curvature, and $\kappa_\delta$ is the normal curvature in direction $\delta$. This is maximized when the magnitude of the normal curvature is the largest, as in when the normal curvature is in the maximum principle direction.
+where $\RomanNumeralCaps{2}$ is the second fundamental tensor, $H$ is mean curvature, $K$ is Gaussian curvature, and $\kappa_\delta$ is the normal curvature in direction $\delta$. This is maximized when the magnitude of the normal curvature is the largest, as in when the normal curvature is in the maximum principle direction.
 
 Therefore, we come to the conclusion that maximum contrast, by our definition, is achieved when the light sourse is positioned along the first principal direction at each point.
 
