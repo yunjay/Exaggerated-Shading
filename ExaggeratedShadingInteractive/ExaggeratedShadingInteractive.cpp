@@ -29,8 +29,10 @@ float lastFrame = 0.0f;
 float xDegrees = 0.0f;
 float yDegrees = 0.0f;
 bool xOn=true;
-float modelSize=10.0f;
+float modelSize=1.0f;
 float diffuse = 1.0f;
+float lightDegrees = 0.0f;
+
 // Shading Variables
 int scales=5; //b, num of scales
 float contributionScale = -0.5;
@@ -85,8 +87,8 @@ int main()
     
     //Load Model
     // //YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
-    //YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
-    YJ bunny(".\\models\\lucy\\lucy.yj");
+    YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
+    //YJ bunny(".\\models\\lucy\\lucy.yj");
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
     float feature = featureSize(bunny.vertices);
@@ -107,7 +109,7 @@ int main()
     GLuint* currentShader=&xShade;
 
     //view
-    glm::vec3 cameraPos = glm::vec3(0, 0, 1);
+    glm::vec3 cameraPos = glm::vec3(0, 0.0, 1);
     //light settings
     glm::vec3 lightPos = glm::vec3(-1, 1, 1);
     glm::vec3 lightDiffuse = glm::vec3(1, 1, 1)*diffuse;
@@ -137,6 +139,7 @@ int main()
         ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Model Size", &modelSize, 0.01f, 100.0f);
+        ImGui::SliderFloat("Rotate Global Light Source", &lightDegrees, 0.0f, 360.0f);
         //ImGui::SliderFloat("Brightness", &diffuse, 0.0f, 2.0f);
         ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 19);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
@@ -177,14 +180,15 @@ int main()
 
         //opengl matrice transforms are applied from the right side. (last first)
         glm::mat4 model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(0,0.0, -1.0f));
-        //model = glm::translate(model, (-1.0f) * cen);
+        //model = glm::translate(model, glm::vec3(0,0.0, -1.0f));
+        model = glm::translate(model, (-1.0f) * cen + glm::vec3(0.0,-0.5,-1.0f));
         model = glm::scale(model, glm::vec3(1.0/modelScaleFactor, 1.0 / modelScaleFactor, 1.0 / modelScaleFactor));
         model = glm::scale(model, glm::vec3(modelSize, modelSize, modelSize));
         model = glm::rotate(model, glm::radians(yDegrees), glm::vec3(0,1,0));
         model = glm::rotate(model, glm::radians(xDegrees), glm::vec3(1,0,0));
-        glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0,0,-1), glm::vec3(0,1,0));
-        glm::mat4 projection = glm::perspective(glm::radians(90.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        //glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0,0,-1), glm::vec3(0,1,0));
+        glm::mat4 view = glm::lookAt(cameraPos, (-1.0f) * cen + glm::vec3(0.0, 0.0, -1.0f), glm::vec3(0.0, 1.0, 0.0));
+        glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "model"), 1, GL_FALSE, &model[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(*currentShader, "view"), 1, GL_FALSE, &view[0][0]);
