@@ -33,13 +33,15 @@ For each scale, the standard deviation of the Gaussian filter is increased expon
 
 $$ \sigma_{n+1} = \sqrt{2}\sigma_n $$
 
-As an implementation I've made [a seperate repository](https://github.com/yunjay/YJFileCreator) for preprocessing and saving the smoothed normals of a 3D object at each scale. 
+As an implementation I've made a [seperate repository](https://github.com/yunjay/YJFileCreator) for preprocessing and saving the smoothed normals of a 3D object at each scale using Gaussian fallout as weights. 
 
 With theses smoothed normals, the light direction is adjusted at smoothing per vertex and per scale to attenuate detail at all frequencies.
 
-When $\c_i$ represents light at each scale, and s
+When $c_i$ represents light at each scale, $l_{i+1}$ is the direction of light used at each scale, $c$ is the result intensity of each vertex :
 
+$$c_i = \underset{[-1,1]}{clamp}a()$$
 
+The [$clamp()$](https://thebookofshaders.com/glossary/?search=clamp) function is used for "smooth cel shading" which sets 
 
 
 ### Principal Direction-based Light Adjustment
