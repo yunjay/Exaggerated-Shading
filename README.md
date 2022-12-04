@@ -90,33 +90,37 @@ The paper, published in 2006, renders these exaggerated shadings of 3D objects a
 
 ### Features
 
+- Switch between standard cosine shading and our exaggerated shading method.
+
+![Switch](images/switch.gif)
+
 - Model rotation and size.
 
-
+![RotationAndSize](images/rotationAndSize.gif)
 
 - Rotation of "global" light direction.
 
-
+![LightRotation](images/lightRotation.gif)
 
 - Number of Smoothing Scales to use in rendering.
 
+![Scales](images/scales.gif)
 
+- Exponent to $\sigma$ of the contribution factor for each scale. A low factor will make the contribution of lower frequencies larger, emphasizing small details in the image. Vice versa a higher factor will make the contribution of larger frequencies higher, emphasizing large details and making the shading more smooth and less detailed. Optimal visuals usually lie between -0.5 and -1.0.
 
-- Exponent to $\sigma$ of the contribution factor for each scale. A low factor will make the contribution of lower frequencies larger, emphasizing small details in the image. Vice versa a higher factor will make the contribution of larger frequencies higher, emphasizing large details and making the shading more smooth and less detailed.
+![Contribution](images/contribution.gif)
 
+- Clamp Coefficient $a$ for the "soft cel shading" implemented with *clamp()*. A factor of 20~50 reveals details well in most cases.
 
+![Clamp](images/clamp.gif)
 
-- Clamp Coefficient $a$ for the "soft cel shading" implemented with *clamp()*.
+- Ambient factor added to all lighting. Default set as 0.5 in the methods proposed in the paper.
 
-
-
-- Ambient factor added to all lighting.
-
-
+![Ambient](images/ambient.gif)
 
 - Background Color.
 
-
+![Background](images/background.gif)
 
 ## Dependencies
 
