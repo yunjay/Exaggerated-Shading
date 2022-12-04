@@ -11,6 +11,8 @@ ACM Transactions on Graphics (Proc. SIGGRAPH) 25(3), July 2006.
 
 *Rendering of the 3D object with exaggerated details independent of light orientation can be seen.*
 
+In a directionally lighted scene, surfaces on a 3D mesh that are alligned to or perpendicular to the light direction have a tendency of losing detail and contrast when rendered. This paper provides a shading method that reveals details at all scales.
+
 ## Method
 
 *Exaggerated Shading for Depicting Shape and Detail* proposes an original shading technique for revealing details at all frequencies, independent of light position and surface orientation. 
