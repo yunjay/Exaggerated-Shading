@@ -45,7 +45,7 @@ $n_i$ represents the surface normal at the current scale, and $n_{i+1}$
 $l_{i+1}$ is the direction of light used at each scale, $c$ is the result intensity of each vertex :
 
 $$
-c_i = \underset{[-1,1]}{clamp}(a(n_i \cdot l_{i+1}) ) \newline
+c_i = \underset{[-1,1]}{clamp}(a(n_i \cdot l_{i+1})) \break
 l_{i+1} = l_{global}
 $$
 
