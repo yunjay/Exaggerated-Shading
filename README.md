@@ -41,13 +41,11 @@ The adjusted light intensity for exaggerated shading of details is implemented a
 
 $c_i$ represents light at each scale.
 
-$n_i$ represents the surface normal at the current scale, and $n_{i+1}$
+$n_i$ is the surface normal at the current scale, and $n_{i+1}$
 $l_{i+1}$ is the direction of light used at each scale, $c$ is the result intensity of each vertex :
 
-$$
-c_i = \underset{[-1,1]}{clamp}(a(n_i \cdot l_{i+1})) \break 
-l_{i+1} = l_{global}
-$$
+$$c_i = \underset{[-1,1]}{clamp}(a(n_i \cdot l_{i+1}))$$
+$$l_{i+1} = l_{global}$$
 
 The [clamp()](https://thebookofshaders.com/glossary/?search=clamp) function is used for "smooth cel shading". Used with coefficient $a$, the exaggeration factor for sending values to extreme values of -1 or 1, the clamp functions as a "smooth" version of cel shading where most values are set discretely to either -1 or 1, but still has a continuous transition through -1 and 1.
 
