@@ -58,7 +58,9 @@ Then $c$ is calculated as a weighted sum of lightings at all scales. This result
 
 ### Principal Direction-based Light Adjustment
 
-The basic rendering model simply projects the light source at each point into the tangent plane perpendicular to the smoothed normal. Instead with a formulization of "contrast" proposed in the paper as 
+The basic rendering model simply projects the light source at each point into the tangent plane perpendicular to the smoothed normal. Instead with a formulization of "contrast" proposed in the paper as :
+
+$$ contrast = || \nabla (n \cdot \delta) || $$
 
 ## Implemented Interactive Features
 
