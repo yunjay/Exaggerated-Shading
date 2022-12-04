@@ -1,3 +1,8 @@
+<script
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+  type="text/javascript">
+</script>
+
 # Exaggerated Shading Interactive
 Interactive OpenGL program implementing [Xshade](https://pixl.cs.princeton.edu/pubs/Rusinkiewicz_2006_ESF/exaggerated_shading.pdf) 
  (Szymon Rusinkiewicz, Michael Burns, and Doug DeCarlo.
@@ -24,9 +29,18 @@ This shading method is introduced as a form of "Multiscale local toon shading", 
 
 The shading method proposed in the paper requires several levels of smoothed normals to be preprocessed, each using a progressively larger Gaussian filter for smoothing of the normals.
 
+For each scale, the standard deviation of the Gaussian filter is increased exponentially by a constant scalar coefficient. The paper suggests $\sqrt(2)$ for each level.
+
+$ \sigma_{n+1} = \sqrt(2)\sigma_n $
+
+
+
+
 ### Principal Direction-based Light Adjustment
 
-The basic rendering model simply projects the light source at each point into the tangent plane perpendicular to the smoothed normal. Instead with a formulization of "contrast" proposed in the paper as :
+The basic rendering model simply projects the light source at each point into the tangent plane perpendicular to the smoothed normal. Instead with a formulization of "contrast" proposed in the paper as 
+
+
 
 ## Dependencies
 
