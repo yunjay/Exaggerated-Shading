@@ -41,7 +41,7 @@ When $c_i$ represents light at each scale, $l_{i+1}$ is the direction of light u
 
 $$c_i = \underset{[-1,1]}{clamp}a()$$
 
-The [$clamp()$](https://thebookofshaders.com/glossary/?search=clamp) function is used for "smooth cel shading" which sets 
+The [clamp()](https://thebookofshaders.com/glossary/?search=clamp) function is used for "smooth cel shading" which sets 
 
 
 ### Principal Direction-based Light Adjustment
