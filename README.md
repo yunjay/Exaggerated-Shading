@@ -1,4 +1,3 @@
-
 # Exaggerated Shading Interactive
 Interactive OpenGL program implementing [Xshade](https://pixl.cs.princeton.edu/pubs/Rusinkiewicz_2006_ESF/exaggerated_shading.pdf) 
  (Szymon Rusinkiewicz, Michael Burns, and Doug DeCarlo.
