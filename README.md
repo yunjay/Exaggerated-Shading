@@ -31,7 +31,7 @@ The shading method proposed in the paper requires several levels of smoothed nor
 
 For each scale, the standard deviation of the Gaussian filter is increased exponentially by a constant scalar coefficient. The paper suggests $\sqrt{2}$ for each level.
 
-$ \sigma_{n+1} = \sqrt(2)\sigma_n $
+$ \sigma_{n+1} = \sqrt{2}\sigma_n $
 
 
 
