@@ -88,6 +88,7 @@ Therefore, we come to the conclusion that maximum contrast, by our definition, i
 
 The paper, published in 2006, renders these exaggerated shadings of 3D objects as images. Currently this method can be easily rendered in realtime with interactive controls for the user controlled hyperparameters provided in the paper.
 
+**Features**
 
 
 
