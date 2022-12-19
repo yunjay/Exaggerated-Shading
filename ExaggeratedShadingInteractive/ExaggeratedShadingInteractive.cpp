@@ -33,6 +33,7 @@ float modelSize=1.0f;
 float diffuse = 1.0f;
 float lightDegrees = 0.0f;
 glm::vec3 background(30.0 / 255, 30.0 / 255, 30.0 / 255);
+glm::vec3 textureUni(1.0f);
 
 // Shading Variables
 int scales=10; //b, num of scales
@@ -153,7 +154,7 @@ int main()
         ImGui::SliderFloat("Ambient", &ambient, 0.0f, 1.0f);
         ImGuiColorEditFlags misc_flags = (0 | ImGuiColorEditFlags_NoDragDrop | 0 | ImGuiColorEditFlags_NoOptions);
         ImGui::ColorEdit3("Background Color", (float*)&background, misc_flags);
-
+        ImGui::ColorEdit3("Background Color", (float*)&textureUni, misc_flags);
         ImGui::End();
 
         
@@ -181,6 +182,7 @@ int main()
 
         glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
+        glUniform3f(glGetUniformLocation(*currentShader,"textureUni"),textureUni.x,textureUni.y,textureUni.z);
         if (xOn) {
             // YOU NEED TO BIND PROGRAM WITH glUseProgram BEFORE glUniform
             //send contribution ki to shader as uniform (array)
