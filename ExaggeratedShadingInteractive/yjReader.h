@@ -204,3 +204,39 @@ public:
 		return true;
 	}
 };
+
+bool loadPD(const std::string path,
+	std::vector<glm::vec3> &outMaxDirections, std::vector<glm::vec3> &outMinDirections,
+	std::vector<float> &outMaxCurvatures, std::vector<float> &outMinCurvatures) {
+	//how to construct indicies for EBO..?
+	//maybe mix with assimp in usage as a quick hack
+	std::cout << "Loading .pd file : " << path << "\n";
+	//std::vector<glm::vec3> vertices;
+	//std::vector<glm::vec3> normals;
+	std::ifstream infile(path);
+	glm::vec3 vec(0.0f);
+	std::string header;
+	float x, y, z;
+	while (infile >> header >> x >> y >> z) {
+		if (header == "b") {
+			vec = glm::vec3(x, y, z);
+			outMaxDirections.push_back(vec);
+		}
+		else if (header == "s") {
+			vec = glm::vec3(x, y, z);
+			outMinDirections.push_back(vec);
+		}
+		else if (header == "bk") {
+			outMaxCurvatures.push_back(x);
+		}
+		else if (header == "sk") {
+			outMinCurvatures.push_back(x);
+		}
+		else return false;
+	}
+
+	//out_vertices=vertices;
+	//out_normals=normals;
+
+	return true;
+}

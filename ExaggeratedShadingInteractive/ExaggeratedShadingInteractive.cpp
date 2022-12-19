@@ -85,11 +85,22 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
 
-
     //Load Model
-    // //YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
+    //YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
     YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
     //YJ bunny(".\\models\\lucy\\lucy.yj");
+    
+    //std::string pd(.\\models\\golfball\\GolfBallOBJ.pd);
+    std::string pd(".\\models\\bunny\\stanford-bunny.pd");
+    //std::string pd(".\\models\\lucy\\lucy.pd");
+
+
+    std::vector<glm::vec3> maxDirections;
+    std::vector<glm::vec3> minDirections;
+    std::vector<float> maxCurvatures;
+    std::vector<float> minCurvatures;
+    if (!loadPD(pd, maxDirections, minDirections, maxCurvatures, minCurvatures)) { cout << "Could not read principal directions.\n"; };
+
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
     float feature = featureSize(bunny.vertices);
@@ -154,7 +165,7 @@ int main()
         ImGui::SliderFloat("Ambient", &ambient, 0.0f, 1.0f);
         ImGuiColorEditFlags misc_flags = (0 | ImGuiColorEditFlags_NoDragDrop | 0 | ImGuiColorEditFlags_NoOptions);
         ImGui::ColorEdit3("Background Color", (float*)&background, misc_flags);
-        ImGui::ColorEdit3("Background Color", (float*)&textureUni, misc_flags);
+        ImGui::ColorEdit3("Texture Color", (float*)&textureUni, misc_flags);
         ImGui::End();
 
         
