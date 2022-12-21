@@ -86,20 +86,16 @@ int main()
     ImGui_ImplOpenGL3_Init("#version 430");
 
     //Load Model
-    //YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
-    YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
+    YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
+    //YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
     //YJ bunny(".\\models\\lucy\\lucy.yj");
     
     //std::string pd(.\\models\\golfball\\GolfBallOBJ.pd);
     std::string pd(".\\models\\bunny\\stanford-bunny.pd");
     //std::string pd(".\\models\\lucy\\lucy.pd");
-
-
-    std::vector<glm::vec3> maxDirections;
-    std::vector<glm::vec3> minDirections;
-    std::vector<float> maxCurvatures;
-    std::vector<float> minCurvatures;
-    if (!loadPD(pd, maxDirections, minDirections, maxCurvatures, minCurvatures)) { cout << "Could not read principal directions.\n"; };
+    
+    bunny.pdPath = pd;
+    bunny.loadPD();
 
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
@@ -115,8 +111,9 @@ int main()
     GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
     GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
     GLuint softToon = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/softToon.fs");
-    //GLuint principalDirections=loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.fs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/principalDirections.gs");
-    
+    GLuint principalDirections=loadShader("..\\shaders\\principalDirections.vs", "..\\shaders\\principalDirections.fs","..\\shaders\\principalDirections.gs");
+    GLuint xShadePD = loadShader("..\\shaders\\xShadePD.vs","..\\shaders\\xShadePD.fs");
+ 
 
     
     
@@ -193,7 +190,7 @@ int main()
 
         glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
-        glUniform3f(glGetUniformLocation(*currentShader,"textureUni"),textureUni.x,textureUni.y,textureUni.z);
+        glUniform3f(glGetUniformLocation(*currentShader,"textureColor"),textureUni.x,textureUni.y,textureUni.z);
         if (xOn) {
             // YOU NEED TO BIND PROGRAM WITH glUseProgram BEFORE glUniform
             //send contribution ki to shader as uniform (array)
@@ -228,17 +225,16 @@ int main()
 
         bunny.render(*currentShader);
 
-        /*
+        //Principal Directions
         glUseProgram(principalDirections);
-        glUniform1f(glGetUniformLocation(principalDirections,"magnitude"), 0.001*feature);
+        glUniform1f(glGetUniformLocation(principalDirections,"magnitude"), 0.1*feature);
         glUniformMatrix4fv(glGetUniformLocation(principalDirections, "model"), 1, GL_FALSE, &model[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(principalDirections, "view"), 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(principalDirections, "projection"), 1, GL_FALSE, &projection[0][0]);
-        */
+        glBindVertexArray(bunny.VAO);
+        glDrawElements(GL_LINES, static_cast<unsigned int>(bunny.indices.size()), GL_UNSIGNED_INT, 0);
 
-        //bunny.render(principalDirections);
-
-
+        glUseProgram(0);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

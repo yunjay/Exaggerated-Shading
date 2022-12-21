@@ -40,7 +40,7 @@ GLuint loadShader(const GLchar* vertexPath, const GLchar* fragmentPath) {
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, log);
-        std::cout << "Vertex shader compilation failed\n" << log << std::endl;
+        std::cout << "Vertex shader : "<< vertexPath << " compilation failed.\n" << log << "\n";
     }
 
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -50,7 +50,7 @@ GLuint loadShader(const GLchar* vertexPath, const GLchar* fragmentPath) {
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, log);
-        std::cout << "Fragment shader compilation failed\n" << log << std::endl;
+        std::cout << "Fragment shader : "<< fragmentPath << " compilation failed.\n" << log << "\n";
     }
 
     //program combines above shaders
@@ -61,7 +61,7 @@ GLuint loadShader(const GLchar* vertexPath, const GLchar* fragmentPath) {
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(program, 512, NULL, log);
-        std::cout << "Shader program linking failed\n" << log << "\n";
+        std::cout << "Shader program between "<< vertexPath<<", "<< fragmentPath<<" linking failed.\n" << log << "\n";
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -114,7 +114,7 @@ GLuint loadShader(const GLchar* vertexPath, const GLchar* fragmentPath, const GL
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, log);
-        std::cout << "Vertex shader compilation failed\n" << log << std::endl;
+        std::cout << "Vertex shader : " << vertexPath << " compilation failed.\n" << log << "\n";
     }
 
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -124,7 +124,7 @@ GLuint loadShader(const GLchar* vertexPath, const GLchar* fragmentPath, const GL
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, log);
-        std::cout << "Fragment shader compilation failed\n" << log << std::endl;
+        std::cout << "Fragment shader : " << fragmentPath << " compilation failed.\n" << log << "\n";
     }
 
     geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
@@ -134,7 +134,7 @@ GLuint loadShader(const GLchar* vertexPath, const GLchar* fragmentPath, const GL
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, log);
-        std::cout << "Geometry shader compilation failed\n" << log << std::endl;
+        std::cout << "Geometry shader compilation failed\n" << log << "\n";
     }
 
     //program combines above shaders
@@ -148,7 +148,7 @@ GLuint loadShader(const GLchar* vertexPath, const GLchar* fragmentPath, const GL
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(program, 512, NULL, log);
-        std::cout << "Shader program linking failed\n" << log << "\n";
+        std::cout << "Shader program between " << vertexPath << ", " << geometryPath <<", " << fragmentPath << " linking failed.\n" << log << "\n";
     }
 
     //glDetachShader(program, vertexShader) should be called after linking, but I'll keep it simple

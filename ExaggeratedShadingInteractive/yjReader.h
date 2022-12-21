@@ -43,16 +43,19 @@ bool loadNormalsYJ(std::string path,
 }
 class YJ {
 public:
-	GLuint VAO, positionBuffer, normalBuffer, textureBuffer, smoothedNormalsBuffer, EBO; 
+	GLuint VAO, positionBuffer, normalBuffer, textureBuffer, smoothedNormalsBuffer, EBO, maxPD, minPD, maxCurv, minCurv; 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> textureCoordinates;
 	std::vector<unsigned int> indices;
-	std::string path;
+	std::string path, pdPath;
 	std::vector<glm::vec3> smoothedNormals[20];
 	//std::vector<glm::vec3[20]> smoothedNormalsResized; -> YOU CAN'T MAKE A VECTOR OF PLAIN ARRAYS
 	glm::vec4* smoothedNormalsSingleArr;
 	bool isSet = false;
+
+	std::vector<glm::vec3> maxPDs, minPDs;
+	std::vector<float> maxCurvs, minCurvs;
 
 	YJ(std::string path ) {
 		this->path = path;
@@ -121,6 +124,40 @@ public:
 			}
 		}
 	}
+	bool loadPD() {
+		//how to construct indicies for EBO..?
+		//maybe mix with assimp in usage as a quick hack
+		std::cout << "Loading .pd file : " << pdPath << "\n";
+		//std::vector<glm::vec3> vertices;
+		//std::vector<glm::vec3> normals;
+		std::ifstream infile(pdPath);
+		glm::vec3 vec(0.0f);
+		std::string header;
+		float x, y, z;
+		while (infile >> header >> x >> y >> z) {
+			if (header == "b") {
+				vec = glm::vec3(x, y, z);
+				maxPDs.push_back(vec);
+			}
+			else if (header == "s") {
+				vec = glm::vec3(x, y, z);
+				minPDs.push_back(vec);
+			}
+			else if (header == "bk") {
+				maxCurvs.push_back(x);
+			}
+			else if (header == "sk") {
+				minCurvs.push_back(x);
+			}
+			else return false;
+		}
+
+		//out_vertices=vertices;
+		//out_normals=normals;
+
+		return true;
+	}
+
 	void setupYJ() {
 		std::cout << "Setting up buffers.\n";
 
@@ -131,6 +168,10 @@ public:
 		
 		glGenBuffers(1, &EBO); 
 
+		glGenBuffers(1, &maxPD);
+		glGenBuffers(1, &minPD);
+		glGenBuffers(1, &maxCurv);
+		glGenBuffers(1, &minCurv);
 
 		//VAO
 		glBindVertexArray(VAO); 
@@ -141,6 +182,19 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 		
+		// maxPD, minPD, maxCurv, minCurv
+
+		glBindBuffer(GL_ARRAY_BUFFER, maxPD);
+		glBufferData(GL_ARRAY_BUFFER, maxPDs.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, minPD);
+		glBufferData(GL_ARRAY_BUFFER, minPDs.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, maxCurv);
+		glBufferData(GL_ARRAY_BUFFER, maxCurvs.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, minCurv);
+		glBufferData(GL_ARRAY_BUFFER, minCurvs.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+
+
+
 		//EBO
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
@@ -159,7 +213,21 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		
-		
+		glEnableVertexAttribArray(3);
+		glBindBuffer(GL_ARRAY_BUFFER, maxPD);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		glEnableVertexAttribArray(4);
+		glBindBuffer(GL_ARRAY_BUFFER, minPD);
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		glEnableVertexAttribArray(5);
+		glBindBuffer(GL_ARRAY_BUFFER, maxCurv);
+		glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		glEnableVertexAttribArray(6);
+		glBindBuffer(GL_ARRAY_BUFFER, minCurv);
+		glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		//SEND SMOOTHED NORMALS TO SHADER
 		//SSBO //smoothedNormalsBuffer is GLuint ID
 		//glBufferData(GL_SHADER_STORAGE_BUFFER,sizeof(smoothedNormals[0])*20,smoothedNormals,GL_STATIC_DRAW);
@@ -169,7 +237,7 @@ public:
 		glGenBuffers(1, &smoothedNormalsBuffer); //vertex buffer object
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER,smoothedNormalsBuffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, 20*smoothedNormals[0].size()*sizeof(glm::vec4), smoothedNormalsSingleArr, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER,4,smoothedNormalsBuffer);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER,7,smoothedNormalsBuffer);
 		
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 		glBindVertexArray(0);
@@ -190,12 +258,6 @@ public:
 		
 		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
 
-		//glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, &indices[0]);
-
-
-		//glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-		
-		//glDrawArrays(GL_TRIANGLE_FAN, 0, vertices.size());
 
 		//glDisableVertexAttribArray(0);
 		//glDisableVertexAttribArray(1);
@@ -205,38 +267,3 @@ public:
 	}
 };
 
-bool loadPD(const std::string path,
-	std::vector<glm::vec3> &outMaxDirections, std::vector<glm::vec3> &outMinDirections,
-	std::vector<float> &outMaxCurvatures, std::vector<float> &outMinCurvatures) {
-	//how to construct indicies for EBO..?
-	//maybe mix with assimp in usage as a quick hack
-	std::cout << "Loading .pd file : " << path << "\n";
-	//std::vector<glm::vec3> vertices;
-	//std::vector<glm::vec3> normals;
-	std::ifstream infile(path);
-	glm::vec3 vec(0.0f);
-	std::string header;
-	float x, y, z;
-	while (infile >> header >> x >> y >> z) {
-		if (header == "b") {
-			vec = glm::vec3(x, y, z);
-			outMaxDirections.push_back(vec);
-		}
-		else if (header == "s") {
-			vec = glm::vec3(x, y, z);
-			outMinDirections.push_back(vec);
-		}
-		else if (header == "bk") {
-			outMaxCurvatures.push_back(x);
-		}
-		else if (header == "sk") {
-			outMinCurvatures.push_back(x);
-		}
-		else return false;
-	}
-
-	//out_vertices=vertices;
-	//out_normals=normals;
-
-	return true;
-}

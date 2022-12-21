@@ -2,6 +2,10 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
+layout (location = 3) in vec3 maxPD;
+layout (location = 4) in vec3 minPD;
+layout (location = 5) in float maxCurv;
+layout (location = 6) in float minCurv;
 //vec3 smoothedNormals[20][]; -> not legal
 
 layout(binding = 7, std430) buffer smoothedNormalsBuffer  
@@ -42,7 +46,7 @@ void main() {
     
 
     TexCoords = aTexCoords;
-    //vec3 textureColor = vec3(0.95,0.95,0.95);
+    vec3 textureColor = vec3(0.95,0.95,0.95);
 
     //vec3 light_ip1;
     //vec3 normal_i;
@@ -61,32 +65,15 @@ void main() {
         //tangent plane projection
         //light_ip1 = (-1.0)*normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
         light_ip1 = normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
-        c_i = clamp(clampCoef*dot(normal_i,light_ip1),-1.0,1.0);
+        
+        vec4 light_effective = vec4(normalize(dot(maxPD,vec3(light_ip1))*maxPD + vec3(light_ip1)),1.0);
+        //c_i = clamp(clampCoef*dot(normal_i,light_ip1),-1.0,1.0);
+        c_i = clamp(clampCoef*dot(normal_i,light_effective),-1.0,1.0);
         detailTerms+=contribution[i]*c_i;
     }
-    //actual implementation    
+
+
     col=(ambient + 0.5*(contribution[scales]*dot(smoothedNormals[gl_VertexID+scales*size],lightGlobal)+detailTerms));
     
-    //check normals, and indexing   
-    //col=dot(normalize(smoothedNormals[gl_VertexID + size*(scales-1)]),lightGlobal)*vec4(textureColor,0.0);
-
-    //check clampCoef
-    //col = 0.1*clampCoef*vec4(textureColor,0.0);
     
-    //check detail terms
-    //col= 2*detailTerms*vec4(textureColor,0.0);
-
-    //check contribution uniform
-    //col = 2*contribution[0]*vec4(textureColor,0.0);
-
-    //check c_i
-    /*
-    int i=scales-1;
-    normal_i=normalize(smoothedNormals[gl_VertexID+i*size]);
-    normal_ip1=normalize(smoothedNormals[gl_VertexID+(i+1)*size]);
-        
-    light_ip1=normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
-    c_i = clamp(clampCoef*dot(normal_i,light_ip1),-1.0,1.0);
-    col = (0.5+0.5*c_i)*vec4(textureColor,0.0);
-    */
 }
