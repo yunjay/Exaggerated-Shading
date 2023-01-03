@@ -13,67 +13,29 @@ layout(binding = 7, std430) buffer smoothedNormalsBuffer
     vec4 smoothedNormals[];
 };
 
-out vec2 TexCoords;
-
-//out vec3 col;
-out float col;
-
 struct Light {
     vec3 position;
     vec3 diffuse;
 };
+out vec2 TexCoords;
+out float col;
+
+//out vec3 col;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 //"global" lighting
-
 uniform Light light;
-
-uniform float clampCoef;
-uniform int scales;
-uniform int size;
-uniform float contribution[20];
 uniform float ambient;
+uniform float pdScaler;
 
 void main() {
     gl_Position = projection * view *  model * vec4(aPos, 1.0f);
     vec3 FragPos = vec3(model * vec4(aPos, 1.0f)); 
-    vec3 Normal = normalize(mat3(transpose(inverse(model))) * aNormal);
-    //vec3 Normal = normalize(aNormal);
-    //vec3 lightGlobal = normalize(light.position - FragPos);
-    vec4 lightGlobal = vec4(normalize(light.position - FragPos),0.0);
-    
-
-    TexCoords = aTexCoords;
-    vec3 textureColor = vec3(0.95,0.95,0.95);
-
-    //vec3 light_ip1;
-    //vec3 normal_i;
-    //vec3 normal_ip1;
-    vec4 light_ip1;
-    vec4 normal_i;
-    vec4 normal_ip1;
-    
-    float detailTerms=0.0;
-    float c_i=0.0;
-    for(int i=0;i<scales;i++){
-        //load smoothed normals
-        normal_i=normalize(smoothedNormals[gl_VertexID+i*size]);
-        normal_ip1=normalize(smoothedNormals[gl_VertexID+(i+1)*size]);
-
-        //tangent plane projection
-        //light_ip1 = (-1.0)*normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
-        light_ip1 = normalize(lightGlobal-dot(lightGlobal,normal_ip1)*normal_ip1);
-        
-        vec4 light_effective = vec4(normalize(dot(maxPD,vec3(light_ip1))*maxPD + vec3(light_ip1)),1.0);
-        //c_i = clamp(clampCoef*dot(normal_i,light_ip1),-1.0,1.0);
-        c_i = clamp(clampCoef*dot(normal_i,light_effective),-1.0,1.0);
-        detailTerms+=contribution[i]*c_i;
-    }
-
-
-    col=(ambient + 0.5*(contribution[scales]*dot(smoothedNormals[gl_VertexID+scales*size],lightGlobal)+detailTerms));
-    
-    
+    vec3 Normal = mat3(transpose(inverse(model))) * aNormal;
+    vec3 lightGlobal = normalize(light.position - FragPos);
+    vec3 lightEffective = pdScaler*(maxCurv*maxCurv - minCurv*minCurv)*dot(maxPD,lightGlobal)*maxPD + lightGlobal;
+    lightEffective = normalize(lightEffective);
+    col = ambient + dot(lightEffective,Normal);
 }

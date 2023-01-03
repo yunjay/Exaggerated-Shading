@@ -28,7 +28,7 @@ float lastFrame = 0.0f;
 // UI
 float xDegrees = 0.0f;
 float yDegrees = 0.0f;
-bool xOn=true;
+bool PDon = false;
 float modelSize=1.0f;
 float diffuse = 1.0f;
 float lightDegrees = 0.0f;
@@ -46,7 +46,11 @@ float clampCoef = 20.0;
 int main()
 {
     //xOn = false;
+    enum shadingType { ExaggeratedShading, ExaggeratedShadingPD, Diffuse };
+    shadingType shadingTypeArr[] = { ExaggeratedShading,ExaggeratedShadingPD, Diffuse };
+    shadingType currentShading = ExaggeratedShading;
 
+    float pdScaler = 0.1;
 
     // glfw: initialize and configure
     glfwInit();
@@ -86,17 +90,16 @@ int main()
     ImGui_ImplOpenGL3_Init("#version 430");
 
     //Load Model
-    YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
-    //YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
+    //YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
+    YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
     //YJ bunny(".\\models\\lucy\\lucy.yj");
     
-    //std::string pd(.\\models\\golfball\\GolfBallOBJ.pd);
-    std::string pd(".\\models\\bunny\\stanford-bunny.pd");
-    //std::string pd(".\\models\\lucy\\lucy.pd");
     
-    bunny.pdPath = pd;
-    bunny.loadPD();
-
+    bunny.pdPath = bunny.path;
+    bunny.pdPath.replace(bunny.pdPath.end()-2, bunny.pdPath.end(),"pd");
+    bunny.loadPD(); bunny.setup();
+    cout << "First Max PD : " << bunny.maxPDs[0].x<<", "<<bunny.maxPDs[0].y << ", " << bunny.maxPDs[0].z << ", First Max Curvature : " << bunny.maxCurvs[0] << ".\n";
+    cout << "First Min PD : " << bunny.minPDs[0].x << ", " << bunny.minPDs[0].y << ", " << bunny.minPDs[0].z << ", First Min Curvature : " << bunny.minCurvs[0] << ".\n";
 
     //Sigma values. from featureSize and multiplied by sqrt2 every step.
     float feature = featureSize(bunny.vertices);
@@ -111,8 +114,9 @@ int main()
     GLuint cosine = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.fs");
     GLuint xShade = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.vs","C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/xShade.fs");
     GLuint softToon = loadShader("C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/cosine.vs", "C:/Users/lab/Desktop/yj/ExaggeratedShadingInteractive/shaders/softToon.fs");
-    GLuint principalDirections=loadShader("..\\shaders\\principalDirections.vs", "..\\shaders\\principalDirections.fs","..\\shaders\\principalDirections.gs");
     GLuint xShadePD = loadShader("..\\shaders\\xShadePD.vs","..\\shaders\\xShadePD.fs");
+    GLuint PDmax = loadShader("..\\shaders\\PDmax.vs", "..\\shaders\\PDmax.fs", "..\\shaders\\PDmax.gs");
+    GLuint PDmin = loadShader("..\\shaders\\PDmin.vs", "..\\shaders\\PDmin.fs", "..\\shaders\\PDmin.gs");
  
 
     
@@ -126,6 +130,8 @@ int main()
     glm::vec3 lightPos = lightPosInit;
     glm::vec3 lightDiffuse = glm::vec3(1, 1, 1)*diffuse;
 
+
+    glLineWidth(4);
 
     //render loop
     while (!glfwWindowShouldClose(window))
@@ -150,7 +156,15 @@ int main()
         //IMGui window
         ImGui::Begin("XShade Interactive");
 
-        ImGui::Checkbox("Exaggerated Shading", &xOn);
+
+        
+        const char* listbox_shading_items[] = { "Exaggerated Shading", "Principal Direction Exaggerated Shading", "Diffuse"};
+        static int listbox_item_shading = 2;
+        ImGui::ListBox("Shading Method", &listbox_item_shading, listbox_shading_items, IM_ARRAYSIZE(listbox_shading_items), 3);
+        currentShading = shadingType(listbox_item_shading);
+
+        ImGui::Checkbox("Show principal directions", &PDon);
+        
         ImGui::SliderFloat("Rotate X", &xDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Rotate Y", &yDegrees, 0.0f, 360.0f);
         ImGui::SliderFloat("Model Size", &modelSize, 0.1f, 10.0f);
@@ -158,14 +172,27 @@ int main()
         //ImGui::SliderFloat("Brightness", &diffuse, 0.0f, 2.0f);
         ImGui::SliderInt("Number of Smoothing Scales", &scales, 1, 20);
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
-        ImGui::SliderFloat("Clamp Coefficient for Light at Each Scale", &clampCoef, 1.0f, 1000.0f);
+        ImGui::SliderFloat("Clamp Coefficient for Light at Each Scale", &clampCoef, 1.0f, 200.0f);
         ImGui::SliderFloat("Ambient", &ambient, 0.0f, 1.0f);
+        ImGui::SliderFloat("Principal Direction Contribution", &pdScaler, 0.0f, 10000000.0f);
         ImGuiColorEditFlags misc_flags = (0 | ImGuiColorEditFlags_NoDragDrop | 0 | ImGuiColorEditFlags_NoOptions);
         ImGui::ColorEdit3("Background Color", (float*)&background, misc_flags);
         ImGui::ColorEdit3("Texture Color", (float*)&textureUni, misc_flags);
         ImGui::End();
 
-        
+        switch (currentShading) {
+        case ExaggeratedShading:
+            currentShader = &xShade;
+            break;
+        case ExaggeratedShadingPD:
+            currentShader = &xShadePD;
+            break;
+        case Diffuse:
+            currentShader = &cosine;
+            break;
+        }
+
+
         //contribution factor
         GLfloat contributionBeforeNorm[20]={0};
         GLfloat contributionSum = 0;
@@ -178,9 +205,6 @@ int main()
             //cout << "Contribution " << i << " : " << contribution[i] << "\n";
         }
         
-        //if (!xOn)currentShader = &softToon;
-        if (!xOn)currentShader = &cosine;
-        else currentShader = &xShade;
 
         glUseProgram(*currentShader);
 
@@ -191,13 +215,16 @@ int main()
         glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
         glUniform3f(glGetUniformLocation(*currentShader,"textureColor"),textureUni.x,textureUni.y,textureUni.z);
-        if (xOn) {
+        if (currentShading!=Diffuse) {
             // YOU NEED TO BIND PROGRAM WITH glUseProgram BEFORE glUniform
             //send contribution ki to shader as uniform (array)
-            glUniform1fv(glGetUniformLocation(xShade, "contribution"), 20, contribution);
-            glUniform1f(glGetUniformLocation(xShade,"clampCoef"),clampCoef);
-            glUniform1i(glGetUniformLocation(xShade, "scales"), scales);
-            glUniform1f(glGetUniformLocation(xShade, "ambient"), ambient);
+            glUniform1fv(glGetUniformLocation(*currentShader, "contribution"), 20, contribution);
+            glUniform1f(glGetUniformLocation(*currentShader,"clampCoef"),clampCoef);
+            glUniform1i(glGetUniformLocation(*currentShader, "scales"), scales);
+            glUniform1f(glGetUniformLocation(*currentShader, "ambient"), ambient);
+            if(currentShading==ExaggeratedShadingPD){
+                glUniform1f(glGetUniformLocation(*currentShader,"pdScaler"),pdScaler);
+            }
         }
 
         //opengl matrice transforms are applied from the right side. (last first)
@@ -225,14 +252,24 @@ int main()
 
         bunny.render(*currentShader);
 
+
         //Principal Directions
-        glUseProgram(principalDirections);
-        glUniform1f(glGetUniformLocation(principalDirections,"magnitude"), 0.1*feature);
-        glUniformMatrix4fv(glGetUniformLocation(principalDirections, "model"), 1, GL_FALSE, &model[0][0]);
-        glUniformMatrix4fv(glGetUniformLocation(principalDirections, "view"), 1, GL_FALSE, &view[0][0]);
-        glUniformMatrix4fv(glGetUniformLocation(principalDirections, "projection"), 1, GL_FALSE, &projection[0][0]);
-        glBindVertexArray(bunny.VAO);
-        glDrawElements(GL_LINES, static_cast<unsigned int>(bunny.indices.size()), GL_UNSIGNED_INT, 0);
+        /**/
+        if (PDon) {
+            glUseProgram(PDmax);
+            glUniform1f(glGetUniformLocation(PDmax,"magnitude"), 12.0f*modelScaleFactor);
+            glUniformMatrix4fv(glGetUniformLocation(PDmax, "model"), 1, GL_FALSE, &model[0][0]);
+            glUniformMatrix4fv(glGetUniformLocation(PDmax, "view"), 1, GL_FALSE, &view[0][0]);
+            glUniformMatrix4fv(glGetUniformLocation(PDmax, "projection"), 1, GL_FALSE, &projection[0][0]);
+            bunny.render(PDmax);
+
+            glUseProgram(PDmin);
+            glUniform1f(glGetUniformLocation(PDmin, "magnitude"), 12.0f * modelScaleFactor);
+            glUniformMatrix4fv(glGetUniformLocation(PDmin, "model"), 1, GL_FALSE, &model[0][0]);
+            glUniformMatrix4fv(glGetUniformLocation(PDmin, "view"), 1, GL_FALSE, &view[0][0]);
+            glUniformMatrix4fv(glGetUniformLocation(PDmin, "projection"), 1, GL_FALSE, &projection[0][0]);
+            bunny.render(PDmin);
+        }
 
         glUseProgram(0);
 

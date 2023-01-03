@@ -1,0 +1,3 @@
+C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\ExaggeratedShadingInteractive\x64\Release\ExaggeratedShadingInteractive.vcxproj.CopyComplete
+C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\ExaggeratedShadingInteractive\x64\Release\ExaggeratedShadingInteractive.exe
+C:\Users\lab\Desktop\yj\ExaggeratedShadingInteractive\ExaggeratedShadingInteractive\x64\Release\glfw3.dll

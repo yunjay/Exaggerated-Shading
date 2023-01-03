@@ -11,16 +11,16 @@ struct Light {
 
 out vec4 color;
 
+uniform vec3 textureColor;
 uniform Light light;
 
 void main() {
-    vec3 textureColor = vec3(0.8,0.8,0.8);
     // diffuse
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0); //cos
     vec3 diffuse = light.diffuse * diff * textureColor;
     
-    vec3 ambient = vec3(0.1f);
+    vec3 ambient = vec3(0.1f)*textureColor;
     color = vec4(ambient+diffuse, 1.0f);
 }

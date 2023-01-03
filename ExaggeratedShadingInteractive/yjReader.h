@@ -151,14 +151,14 @@ public:
 			}
 			else return false;
 		}
-
+		std::cout << "Number of principal directions : " <<maxPDs.size()+minPDs.size() <<"\n";;
 		//out_vertices=vertices;
 		//out_normals=normals;
 
 		return true;
 	}
 
-	void setupYJ() {
+	void setup() {
 		std::cout << "Setting up buffers.\n";
 
 		glGenVertexArrays(1, &VAO); //vertex array object
@@ -249,7 +249,7 @@ public:
 
 	bool render(GLuint shader) {
 
-		if (!isSet) { setupYJ(); isSet = true; }
+		if (!isSet) { setup(); isSet = true; }
 
 		glUniform1i(glGetUniformLocation(shader, "size"), smoothedNormals[0].size());
 		
@@ -267,3 +267,4 @@ public:
 	}
 };
 
+		
