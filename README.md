@@ -123,9 +123,6 @@ The paper, published in 2006, renders these exaggerated shadings of 3D objects a
 
 ![Ambient](images/ambient.gif)
 
-- Background Color.
-
-![Background](images/background.gif)
 
 ## Dependencies
 
