@@ -7,9 +7,11 @@ in float col;
 out vec4 color;
 //"global" lighting
 
-uniform vec3 textureColor;
+uniform vec3 highColor;
+uniform vec3 lowColor;
 
 void main() {
     //color = vec4(col, 1.0f);
-    color=col*vec4(textureColor,1.0f);
+    //color=col*vec4(textureColor,1.0f);
+    color = vec4( col * (highColor-lowColor) + lowColor,1.0);
 }

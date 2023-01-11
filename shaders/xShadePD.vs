@@ -36,6 +36,14 @@ void main() {
     vec3 Normal = mat3(transpose(inverse(model))) * aNormal;
     vec3 lightGlobal = normalize(light.position - FragPos);
     vec3 lightEffective = pdScaler*(maxCurv*maxCurv - minCurv*minCurv)*dot(maxPD,lightGlobal)*maxPD + lightGlobal;
+    //vec3 lightEffective = pdScaler*maxCurv*dot(maxPD,lightGlobal)*maxPD + lightGlobal;
     lightEffective = normalize(lightEffective);
-    col = ambient + dot(lightEffective,Normal);
+    Normal = normalize(Normal);
+    float diff = max(dot(lightEffective,Normal),0.0);
+    col = max(ambient-0.5,0.0) + diff;
+
 }
+
+
+
+

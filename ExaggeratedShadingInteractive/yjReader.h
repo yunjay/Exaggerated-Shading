@@ -173,7 +173,7 @@ public:
 		glGenBuffers(1, &maxCurv);
 		glGenBuffers(1, &minCurv);
 
-		//VAO
+		//VAO  
 		glBindVertexArray(VAO); 
 
 		glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
@@ -185,13 +185,13 @@ public:
 		// maxPD, minPD, maxCurv, minCurv
 
 		glBindBuffer(GL_ARRAY_BUFFER, maxPD);
-		glBufferData(GL_ARRAY_BUFFER, maxPDs.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, maxPDs.size() * sizeof(glm::vec3), &maxPDs[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, minPD);
-		glBufferData(GL_ARRAY_BUFFER, minPDs.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, minPDs.size() * sizeof(glm::vec3), &minPDs[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, maxCurv);
-		glBufferData(GL_ARRAY_BUFFER, maxCurvs.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, maxCurvs.size() * sizeof(float), &maxCurvs[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, minCurv);
-		glBufferData(GL_ARRAY_BUFFER, minCurvs.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, minCurvs.size() * sizeof(float), &minCurvs[0], GL_STATIC_DRAW);
 
 
 

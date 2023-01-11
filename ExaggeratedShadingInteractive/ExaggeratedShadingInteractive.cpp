@@ -17,8 +17,8 @@
 #include "smoothing.h"
 
 // settings
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 1600;
+const unsigned int SCR_WIDTH = 2400;
+const unsigned int SCR_HEIGHT = 1350;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 // timing
@@ -33,15 +33,17 @@ float modelSize=1.0f;
 float diffuse = 1.0f;
 float lightDegrees = 0.0f;
 glm::vec3 background(30.0 / 255, 30.0 / 255, 30.0 / 255);
-glm::vec3 textureUni(1.0f);
+glm::vec3 textureHigh(1.0f);
+glm::vec3 textureLow(0.0f);
 
 // Shading Variables
 int scales=10; //b, num of scales
-float contributionScale = -0.5;
+float contributionScale = -0.5f;
 GLfloat contribution[20]={0};//init to zeros
 GLfloat sigma[20];
-float ambient = 0.5;
-float clampCoef = 20.0;
+float ambient = 0.5f;
+float clampCoef = 20.0f;
+float magScale = 1.0f;
 
 int main()
 {
@@ -80,6 +82,7 @@ int main()
     // configure global opengl state
     //z buffer
     glEnable(GL_DEPTH_TEST);
+    glLineWidth(3);
 
     //IMGui init    
     IMGUI_CHECKVERSION();
@@ -90,10 +93,11 @@ int main()
     ImGui_ImplOpenGL3_Init("#version 430");
 
     //Load Model
-    //YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
-    YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
+    YJ bunny(".\\models\\golfball\\GolfBallOBJ.yj");
+    //YJ bunny(".\\models\\bunny\\stanford-bunny.yj");
     //YJ bunny(".\\models\\lucy\\lucy.yj");
-    
+    //YJ bunny(".\\models\\david\\rapid.yj");
+
     
     bunny.pdPath = bunny.path;
     bunny.pdPath.replace(bunny.pdPath.end()-2, bunny.pdPath.end(),"pd");
@@ -131,7 +135,6 @@ int main()
     glm::vec3 lightDiffuse = glm::vec3(1, 1, 1)*diffuse;
 
 
-    glLineWidth(4);
 
     //render loop
     while (!glfwWindowShouldClose(window))
@@ -174,10 +177,12 @@ int main()
         ImGui::SliderFloat("Contribution factor of ki", &contributionScale, -5.0f, 5.0f);
         ImGui::SliderFloat("Clamp Coefficient for Light at Each Scale", &clampCoef, 1.0f, 200.0f);
         ImGui::SliderFloat("Ambient", &ambient, 0.0f, 1.0f);
-        ImGui::SliderFloat("Principal Direction Contribution", &pdScaler, 0.0f, 10000000.0f);
+        ImGui::SliderFloat("Principal Direction Contribution", &pdScaler, 0.0f, 10.0f);
+        ImGui::SliderFloat("Principal Direction Arrow Size", &magScale, 0.0f, 2.0f);
         ImGuiColorEditFlags misc_flags = (0 | ImGuiColorEditFlags_NoDragDrop | 0 | ImGuiColorEditFlags_NoOptions);
         ImGui::ColorEdit3("Background Color", (float*)&background, misc_flags);
-        ImGui::ColorEdit3("Texture Color", (float*)&textureUni, misc_flags);
+        ImGui::ColorEdit3("Texture Bright Color", (float*)&textureHigh, misc_flags);
+        ImGui::ColorEdit3("Texture Dark Color", (float*)&textureLow, misc_flags);
         ImGui::End();
 
         switch (currentShading) {
@@ -214,14 +219,15 @@ int main()
 
         glUniform3f(glGetUniformLocation(*currentShader, "light.position"), lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(glGetUniformLocation(*currentShader, "light.diffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z);
-        glUniform3f(glGetUniformLocation(*currentShader,"textureColor"),textureUni.x,textureUni.y,textureUni.z);
+        glUniform3f(glGetUniformLocation(*currentShader,"highColor"),textureHigh.x, textureHigh.y, textureHigh.z);
+        glUniform3f(glGetUniformLocation(*currentShader, "lowColor"), textureLow.x, textureLow.y, textureLow.z);
+        glUniform1f(glGetUniformLocation(*currentShader, "ambient"), ambient);
         if (currentShading!=Diffuse) {
             // YOU NEED TO BIND PROGRAM WITH glUseProgram BEFORE glUniform
             //send contribution ki to shader as uniform (array)
             glUniform1fv(glGetUniformLocation(*currentShader, "contribution"), 20, contribution);
             glUniform1f(glGetUniformLocation(*currentShader,"clampCoef"),clampCoef);
             glUniform1i(glGetUniformLocation(*currentShader, "scales"), scales);
-            glUniform1f(glGetUniformLocation(*currentShader, "ambient"), ambient);
             if(currentShading==ExaggeratedShadingPD){
                 glUniform1f(glGetUniformLocation(*currentShader,"pdScaler"),pdScaler);
             }
@@ -257,14 +263,15 @@ int main()
         /**/
         if (PDon) {
             glUseProgram(PDmax);
-            glUniform1f(glGetUniformLocation(PDmax,"magnitude"), 12.0f*modelScaleFactor);
+            glUniform1f(glGetUniformLocation(PDmax,"magnitude"), magScale / modelScaleFactor*modelSize);
             glUniformMatrix4fv(glGetUniformLocation(PDmax, "model"), 1, GL_FALSE, &model[0][0]);
             glUniformMatrix4fv(glGetUniformLocation(PDmax, "view"), 1, GL_FALSE, &view[0][0]);
             glUniformMatrix4fv(glGetUniformLocation(PDmax, "projection"), 1, GL_FALSE, &projection[0][0]);
             bunny.render(PDmax);
 
             glUseProgram(PDmin);
-            glUniform1f(glGetUniformLocation(PDmin, "magnitude"), 12.0f * modelScaleFactor);
+            //glUniform1f(glGetUniformLocation(PDmin, "magnitude"), magScale* 0.000024f / modelScaleFactor* modelSize);
+            glUniform1f(glGetUniformLocation(PDmin, "magnitude"), magScale  / modelScaleFactor * modelSize);
             glUniformMatrix4fv(glGetUniformLocation(PDmin, "model"), 1, GL_FALSE, &model[0][0]);
             glUniformMatrix4fv(glGetUniformLocation(PDmin, "view"), 1, GL_FALSE, &view[0][0]);
             glUniformMatrix4fv(glGetUniformLocation(PDmin, "projection"), 1, GL_FALSE, &projection[0][0]);
