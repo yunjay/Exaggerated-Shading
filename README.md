@@ -126,7 +126,7 @@ The paper, published in 2006, renders these exaggerated shadings of 3D objects a
 
 ## Dependencies
 
-Written in C++ using OpenGL and GLFW3.
+Written in C++ using OpenGL4 and GLFW3.
 
 Used [ImGui](https://github.com/ocornut/imgui) for interface purposes.
 
